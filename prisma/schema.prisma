@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,21 +9,24 @@ datasource db {
 model Question {
   id         String         @id @default(uuid())
   title      String
-  url        String         @unique
-  difficulty String         // "Easy", "Medium", "Hard"
-  topics     String[]       // e.g. ["Arrays", "Hash Table"]
+  url        String
+  difficulty String
+  topics     String[]
+  sheetSlug  String         @default("striver-a2z")
   createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
   progress   UserProgress[]
 }
 
 model UserProgress {
-  id         String   @id @default(uuid())
-  userId     String   // Clerk user ID
-  questionId String
-  status     String   @default("todo") // "todo" | "in_progress" | "solved" | "skipped"
-  notes      String   @default("")
-  updatedAt  DateTime @updatedAt
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  userId      String
+  questionId  String
+  isCompleted Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, questionId])
   @@index([userId])

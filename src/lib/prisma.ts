@@ -1,3 +1,9 @@
+import dotenv from 'dotenv'
+import path from 'path'
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.join(process.cwd(), '.env.local') })
+}
+
 import { PrismaClient } from '@prisma/client'
 import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'

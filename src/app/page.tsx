@@ -1,106 +1,64 @@
-import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
-import QuestionCard from "@/components/QuestionCard";
-
-async function fetchQuestionsWithProgress(userId: string) {
-  return prisma.question.findMany({
-    orderBy: { createdAt: "asc" },
-    include: {
-      progress: {
-        where: { userId },
-        take: 1,
-      },
-    },
-  });
-}
-
-type QuestionWithProgress = Awaited<ReturnType<typeof fetchQuestionsWithProgress>>[number];
+import Link from "next/link";
+import { BookOpen, BrainCog, FolderHeart } from "lucide-react";
 
 export default async function Home() {
   const { userId } = await auth();
 
-  if (!userId) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[80vh] space-y-4">
-        <h2 className="text-2xl font-bold">Welcome to AlgoMerge</h2>
-        <p className="text-gray-600">Please sign in to view your problem sheet.</p>
-        <div className="bg-black text-white px-4 py-2 rounded-md">
-          <SignInButton />
-        </div>
-      </div>
-    );
-  }
-
-  let questions: QuestionWithProgress[] = [];
-  let dbError = false;
-
-  try {
-    questions = await fetchQuestionsWithProgress(userId);
-  } catch (error) {
-    console.error("Database connection error:", error);
-    dbError = true;
-  }
-
-  const solvedCount = questions.filter(
-    (q) => q.progress[0]?.status === "solved"
-  ).length;
-  const totalCount = questions.length;
+  const sheets = [
+    {
+      title: "Striver A2Z",
+      description: "Master the most frequently asked problems logically step-by-step.",
+      href: "/sheet/striver-a2z",
+      icon: <BookOpen className="w-8 h-8 text-blue-500" />
+    },
+    {
+      title: "NeetCode 150",
+      description: "A curated list of leetcode problems to ace your technical interviews.",
+      href: "/sheet/neetcode-150",
+      icon: <BrainCog className="w-8 h-8 text-indigo-500" />
+    },
+    {
+      title: "Blind 75",
+      description: "The classic collection of 75 essential algorithmic problems.",
+      href: "/sheet/blind-75",
+      icon: <FolderHeart className="w-8 h-8 text-pink-500" />
+    }
+  ];
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Your Problem Sheet</h2>
-        {!dbError && totalCount > 0 && (
-          <div className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-            <span className="text-green-600 font-bold">{solvedCount}</span>
-            <span className="mx-1">/</span>
-            <span>{totalCount}</span>
-            <span className="ml-1">solved</span>
+    <div className="p-8 max-w-4xl mx-auto w-full">
+      <div className="mb-10 text-center md:text-left">
+        <h1 className="text-3xl font-bold mb-3">Welcome to AlgoMerge</h1>
+        <p className="text-gray-600">
+          The all-in-one tracker for popular algorithmic problem sheets. Select a sheet below to get started. 
+          Your progress is automatically saved to your account.
+        </p>
+        {!userId && (
+          <div className="mt-4">
+            <SignInButton mode="modal"><button className="bg-black text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-gray-800 transition-colors">Sign in to track progress</button></SignInButton>
           </div>
         )}
       </div>
 
-      {dbError && (
-        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md mb-6">
-          <p className="font-semibold">Unable to connect to the database.</p>
-          <p className="text-sm mt-1">
-            Please ensure you have configured your database credentials in <code>.env.local</code> and run:
-            <br />
-            <code>npx prisma db push</code>
-            <br />
-            <code>npm run prisma seed</code>
-          </p>
-        </div>
-      )}
-
-      {!dbError && questions.length === 0 && (
-        <div className="text-gray-500 italic">
-          No questions found. Please run <code>npm run prisma seed</code> after setting up the database.
-        </div>
-      )}
-
-      {!dbError && questions.length > 0 && (
-        <div className="grid gap-4 mt-2">
-          {questions.map((q) => {
-            const progress = q.progress[0];
-            return (
-              <QuestionCard
-                key={q.id}
-                question={{
-                  id: q.id,
-                  title: q.title,
-                  url: q.url,
-                  difficulty: q.difficulty,
-                  topics: q.topics,
-                }}
-                initialStatus={(progress?.status as "todo" | "in_progress" | "solved" | "skipped") || "todo"}
-                initialNotes={progress?.notes || ""}
-              />
-            );
-          })}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sheets.map((sheet) => (
+          <Link 
+            key={sheet.href} 
+            href={sheet.href}
+            className="group p-6 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-md bg-white transition-all content-start"
+          >
+            <div className="bg-gray-50 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              {sheet.icon}
+            </div>
+            <h3 className="text-xl font-bold mb-2">{sheet.title}</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              {sheet.description}
+            </p>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

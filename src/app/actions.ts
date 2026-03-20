@@ -6,18 +6,12 @@ import { revalidatePath } from 'next/cache'
 
 export async function updateProgress(
   questionId: string,
-  status: string,
+  isCompleted: boolean,
   notes: string
 ) {
   const { userId } = await auth()
   if (!userId) {
     throw new Error('Unauthorized')
-  }
-
-  // Validate status
-  const validStatuses = ['todo', 'in_progress', 'solved', 'skipped']
-  if (!validStatuses.includes(status)) {
-    throw new Error('Invalid status')
   }
 
   await prisma.userProgress.upsert({
@@ -28,16 +22,17 @@ export async function updateProgress(
       },
     },
     update: {
-      status,
+      isCompleted,
       notes,
     },
     create: {
       userId,
       questionId,
-      status,
+      isCompleted,
       notes,
     },
   })
 
   revalidatePath('/')
+  revalidatePath('/sheet/[sheetSlug]', 'page')
 }
