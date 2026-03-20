@@ -1,40 +1,43 @@
 "use client";
 import React, { useState } from "react";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { BookOpen, BrainCog, FolderHeart, LayoutDashboard } from "lucide-react";
+import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "@/components/ui/sidebar";
+import { BookOpen, BrainCog, FolderHeart, LayoutDashboard, PanelLeft } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   const links = [
     {
       label: "Dashboard",
       href: "/",
       icon: (
-        <LayoutDashboard className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
+        <LayoutDashboard className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
       ),
     },
     {
       label: "Striver A2Z",
       href: "/sheet/striver-a2z",
       icon: (
-        <BookOpen className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
+        <BookOpen className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
       ),
     },
     {
       label: "NeetCode 150",
       href: "/sheet/neetcode-150",
       icon: (
-        <BrainCog className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
+        <BrainCog className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
       ),
     },
     {
       label: "Blind 75",
       href: "/sheet/blind-75",
       icon: (
-        <FolderHeart className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
+        <FolderHeart className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
       ),
     },
   ];
@@ -49,17 +52,21 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-2 ">
+            <div className="mt-10 flex flex-col gap-2 ">
               {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
+                <SidebarLink 
+                  key={idx} 
+                  link={link} 
+                  active={pathname === link.href}
+                />
               ))}
             </div>
           </div>
           <div></div>
         </SidebarBody>
       </Sidebar>
-      <div className="flex flex-1 w-full bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-700 md:rounded-tl-2xl overflow-y-auto">
-        <div className="flex flex-col w-full h-full">
+      <div className="flex-1 p-1 md:p-2 bg-gray-100 dark:bg-neutral-800">
+        <div className="flex flex-col w-full h-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl md:rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none overflow-hidden relative">
           {children}
         </div>
       </div>
@@ -68,30 +75,41 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
 }
 
 export const Logo = () => {
+  const { setOpen } = useSidebar();
   return (
-    <Link
-      href="/"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20 h-8"
-    >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-bold text-black dark:text-white whitespace-pre text-lg line-clamp-1"
+    <div className="flex items-center justify-between w-full h-12 pr-0">
+      <Link
+        href="/"
+        className="font-normal flex space-x-2 items-center text-sm py-1 relative z-20"
       >
-        Opensheet
-      </motion.span>
-    </Link>
+        <Image
+          src="/logo.svg"
+          alt="Opensheet"
+          width={190}
+          height={50}
+          className="dark:invert h-11 w-auto transition-transform duration-300 hover:scale-105"
+        />
+      </Link>
+      <button 
+        onClick={() => setOpen(false)}
+        className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+      >
+        <PanelLeft className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+      </button>
+    </div>
   );
 };
 
 export const LogoIcon = () => {
+  const { setOpen } = useSidebar();
   return (
-    <Link
-      href="/"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20 h-8"
-    >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-    </Link>
+    <div className="flex items-center justify-center w-full h-12">
+      <button 
+        onClick={() => setOpen(true)}
+        className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+      >
+        <PanelLeft className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+      </button>
+    </div>
   );
 };

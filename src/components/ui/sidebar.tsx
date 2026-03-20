@@ -89,14 +89,12 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        "h-full px-3 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[250px] flex-shrink-0",
         className
       )}
       animate={{
-        width: animate ? (open ? "300px" : "60px") : "300px",
+        width: animate ? (open ? "250px" : "60px") : "250px",
       }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
       {...props}
     >
       {children}
@@ -157,10 +155,12 @@ export const MobileSidebar = ({
 export const SidebarLink = ({
   link,
   className,
+  active,
   ...props
 }: {
   link: Links;
   className?: string;
+  active?: boolean;
   props?: LinkProps;
 }) => {
   const { open, animate } = useSidebar();
@@ -168,18 +168,30 @@ export const SidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
+        "flex items-center group/sidebar py-2 px-2 rounded-xl transition-all duration-300 min-h-[44px]",
+        active 
+          ? "bg-white/60 dark:bg-white/10 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-white/40 dark:border-white/5 text-neutral-900 dark:text-neutral-100" 
+          : "hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 text-[#666666] dark:text-neutral-400",
+        open ? "justify-start gap-3" : "justify-center gap-0 px-0",
         className
       )}
       {...props}
     >
-      {link.icon}
+      <div className={cn(
+        "shrink-0 transition-transform duration-300",
+        active && "scale-105"
+      )}>
+        {link.icon}
+      </div>
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-[#666666] dark:text-neutral-400 text-[15px] font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className={cn(
+          "text-[14px] font-medium transition duration-150 whitespace-pre inline-block !p-0 !m-0",
+          active ? "text-neutral-900 dark:text-neutral-100" : "text-inherit"
+        )}
       >
         {link.label}
       </motion.span>
