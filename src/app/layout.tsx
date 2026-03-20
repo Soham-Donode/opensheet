@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs'
 import { auth } from '@clerk/nextjs/server'
+import { AppSidebar } from "@/components/AppSidebar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,20 +33,21 @@ export default async function RootLayout({
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       >
-        <body className="min-h-full flex flex-col">
-          <header className="flex justify-between items-center p-4 border-b">
-            <h1 className="text-xl font-bold">AlgoMerge</h1>
-            <div>
-              {!userId ? (
-                <SignInButton />
-              ) : (
-                <UserButton />
-              )}
-            </div>
-          </header>
-          <main className="flex-1">
-            {children}
-          </main>
+        <body className="h-screen flex flex-col m-0 p-0 overflow-hidden">
+          <AppSidebar>
+            <header className="flex justify-end items-center p-4 border-b border-neutral-200 dark:border-neutral-700 w-full sticky top-0 bg-white dark:bg-neutral-900 z-10">
+              <div>
+                {!userId ? (
+                  <SignInButton />
+                ) : (
+                  <UserButton />
+                )}
+              </div>
+            </header>
+            <main className="flex-1 overflow-y-auto">
+              {children}
+            </main>
+          </AppSidebar>
         </body>
       </html>
     </ClerkProvider>
