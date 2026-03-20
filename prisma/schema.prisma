@@ -10,10 +10,24 @@ datasource db {
 }
 
 model Question {
-  id         String   @id @default(uuid())
+  id         String         @id @default(uuid())
   title      String
-  url        String   @unique
-  difficulty String // "Easy", "Medium", "Hard"
-  topics     String[] // e.g. ["Arrays", "Hash Table"]
-  createdAt  DateTime @default(now())
+  url        String         @unique
+  difficulty String         // "Easy", "Medium", "Hard"
+  topics     String[]       // e.g. ["Arrays", "Hash Table"]
+  createdAt  DateTime       @default(now())
+  progress   UserProgress[]
+}
+
+model UserProgress {
+  id         String   @id @default(uuid())
+  userId     String   // Clerk user ID
+  questionId String
+  status     String   @default("todo") // "todo" | "in_progress" | "solved" | "skipped"
+  notes      String   @default("")
+  updatedAt  DateTime @updatedAt
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId])
 }

@@ -1,7 +1,21 @@
 import prisma from "@/lib/prisma";
-import { Question } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
+import QuestionCard from "@/components/QuestionCard";
+
+async function fetchQuestionsWithProgress(userId: string) {
+  return prisma.question.findMany({
+    orderBy: { createdAt: "asc" },
+    include: {
+      progress: {
+        where: { userId },
+        take: 1,
+      },
+    },
+  });
+}
+
+type QuestionWithProgress = Awaited<ReturnType<typeof fetchQuestionsWithProgress>>[number];
 
 export default async function Home() {
   const { userId } = await auth();
@@ -18,29 +32,40 @@ export default async function Home() {
     );
   }
 
-  let questions: Question[] = [];
+  let questions: QuestionWithProgress[] = [];
   let dbError = false;
 
   try {
-    // Attempt to fetch questions from the database.
-    // If DATABASE_URL is invalid, this will throw an error.
-    questions = await prisma.question.findMany({
-      orderBy: { createdAt: "asc" }
-    });
+    questions = await fetchQuestionsWithProgress(userId);
   } catch (error) {
     console.error("Database connection error:", error);
     dbError = true;
   }
 
+  const solvedCount = questions.filter(
+    (q) => q.progress[0]?.status === "solved"
+  ).length;
+  const totalCount = questions.length;
+
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Your Starting Sheet</h2>
-      
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Your Problem Sheet</h2>
+        {!dbError && totalCount > 0 && (
+          <div className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
+            <span className="text-green-600 font-bold">{solvedCount}</span>
+            <span className="mx-1">/</span>
+            <span>{totalCount}</span>
+            <span className="ml-1">solved</span>
+          </div>
+        )}
+      </div>
+
       {dbError && (
         <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md mb-6">
           <p className="font-semibold">Unable to connect to the database.</p>
           <p className="text-sm mt-1">
-            Please ensure you have configured your database credentials in <code>.env.local</code> and run the seed script:
+            Please ensure you have configured your database credentials in <code>.env.local</code> and run:
             <br />
             <code>npx prisma db push</code>
             <br />
@@ -56,34 +81,24 @@ export default async function Home() {
       )}
 
       {!dbError && questions.length > 0 && (
-        <div className="grid gap-4 mt-6">
-          {questions.map((q) => (
-            <a 
-              key={q.id}
-              href={q.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block p-4 border rounded-lg hover:border-gray-400 transition-colors shadow-sm bg-white"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg text-blue-600 hover:underline">{q.title}</h3>
-                <span className={`text-xs px-2 py-1 rounded font-medium ${
-                  q.difficulty.toLowerCase() === 'easy' ? 'bg-green-100 text-green-800' :
-                  q.difficulty.toLowerCase() === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {q.difficulty}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {q.topics.map((topic: string, i: number) => (
-                  <span key={i} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
-                    {topic}
-                  </span>
-                ))}
-              </div>
-            </a>
-          ))}
+        <div className="grid gap-4 mt-2">
+          {questions.map((q) => {
+            const progress = q.progress[0];
+            return (
+              <QuestionCard
+                key={q.id}
+                question={{
+                  id: q.id,
+                  title: q.title,
+                  url: q.url,
+                  difficulty: q.difficulty,
+                  topics: q.topics,
+                }}
+                initialStatus={(progress?.status as "todo" | "in_progress" | "solved" | "skipped") || "todo"}
+                initialNotes={progress?.notes || ""}
+              />
+            );
+          })}
         </div>
       )}
     </div>

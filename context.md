@@ -1,5 +1,5 @@
 # Product Requirements Document (PRD)  
-**AlgoMerge – Unified DSA Practice & Tracking Platform**
+**Opensheet – Unified DSA Practice & Tracking Platform**
 
 **Version**: 1.0 (MVP-focused, updated March 2026)  
 **Status**: Pre-development  
