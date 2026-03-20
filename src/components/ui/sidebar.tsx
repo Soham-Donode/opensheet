@@ -89,11 +89,16 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-3 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[250px] flex-shrink-0",
+        "h-full py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 flex-shrink-0",
+        open ? "px-3" : "px-[7.5px]",
         className
       )}
       animate={{
         width: animate ? (open ? "250px" : "60px") : "250px",
+      }}
+      transition={{
+        duration: 0.3,
+        ease: "easeInOut"
       }}
       {...props}
     >
@@ -168,11 +173,11 @@ export const SidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex items-center group/sidebar py-2 px-2 rounded-xl transition-all duration-300 min-h-[44px]",
+        "flex items-center group/sidebar rounded-full transition-all duration-300",
         active 
           ? "bg-white/60 dark:bg-white/10 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-white/40 dark:border-white/5 text-neutral-900 dark:text-neutral-100" 
           : "hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 text-[#666666] dark:text-neutral-400",
-        open ? "justify-start gap-3" : "justify-center gap-0 px-0",
+        open ? "py-2 px-3 min-h-[44px] justify-start gap-3" : "h-11 w-11 justify-center gap-0",
         className
       )}
       {...props}
@@ -183,18 +188,21 @@ export const SidebarLink = ({
       )}>
         {link.icon}
       </div>
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className={cn(
-          "text-[14px] font-medium transition duration-150 whitespace-pre inline-block !p-0 !m-0",
-          active ? "text-neutral-900 dark:text-neutral-100" : "text-inherit"
+      <AnimatePresence mode="wait">
+        {open && (
+          <motion.span
+            initial={{ opacity: 0, x: -5 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -5, transition: { duration: 0.1 } }}
+            className={cn(
+              "text-[14px] font-medium transition duration-150 whitespace-pre inline-block !p-0 !m-0",
+              active ? "text-neutral-900 dark:text-neutral-100" : "text-inherit"
+            )}
+          >
+            {link.label}
+          </motion.span>
         )}
-      >
-        {link.label}
-      </motion.span>
+      </AnimatePresence>
     </Link>
   );
 };

@@ -37,19 +37,7 @@ export default async function RootLayout({
         <body className="h-screen flex flex-col m-0 p-0 overflow-hidden">
           <AppSidebar>
             <header className="flex justify-end items-center px-8 py-4 border-b border-neutral-200/50 dark:border-neutral-700/50 w-full sticky top-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg z-30 transition-all duration-300">
-              <div className="flex items-center gap-4">
-                {!userId ? (
-                  <SignInButton mode="modal"><Button variant="glass" className="rounded-full px-6 py-2 h-auto text-sm font-semibold tracking-tight">Sign in</Button></SignInButton>
-                ) : (
-                  <UserButton 
-                    appearance={{
-                      elements: {
-                        avatarBox: "h-9 w-9 border border-neutral-200 dark:border-neutral-700"
-                      }
-                    }}
-                  />
-                )}
-              </div>
+              {/* Profile moved to sidebar bottom */}
             </header>
             <main className="flex-1 overflow-y-auto">
               {children}

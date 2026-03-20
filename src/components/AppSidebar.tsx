@@ -1,12 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "@/components/ui/sidebar";
-import { BookOpen, BrainCog, FolderHeart, LayoutDashboard, PanelLeft } from "lucide-react";
+import { BookOpen, BrainCog, FolderHeart, LayoutDashboard, PanelLeft, LogIn } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -62,11 +64,13 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               ))}
             </div>
           </div>
-          <div></div>
+          <div className="flex flex-col gap-2 pt-4 border-t border-neutral-200/50 dark:border-neutral-700/50">
+            <UserSection />
+          </div>
         </SidebarBody>
       </Sidebar>
       <div className="flex-1 p-1 md:p-2 bg-gray-100 dark:bg-neutral-800">
-        <div className="flex flex-col w-full h-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl md:rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none overflow-hidden relative">
+        <div className="flex flex-col w-full h-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl md:rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none overflow-hidden relative">
           {children}
         </div>
       </div>
@@ -110,6 +114,64 @@ export const LogoIcon = () => {
       >
         <PanelLeft className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
       </button>
+    </div>
+  );
+};
+
+export const UserSection = () => {
+  const { user, isSignedIn } = useUser();
+  const { open } = useSidebar();
+
+  if (!isSignedIn) {
+    return (
+      <div className="w-full">
+        {open ? (
+          <SignInButton mode="modal">
+            <Button variant="ghost" className="w-full justify-start gap-3 h-11 rounded-xl hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 text-neutral-600 dark:text-neutral-400">
+              <LogIn className="h-5 w-5" />
+              <span className="text-sm font-medium">Sign in</span>
+            </Button>
+          </SignInButton>
+        ) : (
+          <div className="flex justify-center w-full">
+            <SignInButton mode="modal">
+              <button className="h-11 w-11 flex items-center justify-center rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 transition-colors">
+                <LogIn className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+              </button>
+            </SignInButton>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("flex items-center rounded-full transition-all duration-300", 
+      open ? "w-full p-2.5 bg-neutral-200/50 dark:bg-neutral-800/50 gap-3" : "h-11 w-11 justify-center")}>
+      <UserButton 
+        appearance={{
+          elements: {
+            avatarBox: "h-9 w-9 border border-black/5 dark:border-white/5 shadow-sm"
+          }
+        }}
+      />
+      <AnimatePresence mode="wait">
+        {open && (
+          <motion.div 
+            initial={{ opacity: 0, x: -5 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -5, transition: { duration: 0.1 } }}
+            className="flex flex-col min-w-0"
+          >
+            <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 truncate leading-tight">
+              {user?.fullName || user?.username || "Learner"}
+            </p>
+            <p className="text-[11px] text-neutral-500 truncate leading-tight mt-0.5">
+              {user?.primaryEmailAddress?.emailAddress}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
