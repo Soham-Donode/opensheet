@@ -1,7 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { BookOpen, BrainCog, FolderHeart } from "lucide-react";
+import SignInCTA from "@/components/SingInCTA";
 
 export default async function Home() {
   const { userId } = await auth();
@@ -35,11 +37,7 @@ export default async function Home() {
           The all-in-one tracker for popular algorithmic problem sheets. Select a sheet below to get started. 
           Your progress is automatically saved to your account.
         </p>
-        {!userId && (
-          <div className="mt-4">
-            <SignInButton mode="modal"><button className="bg-black text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-gray-800 transition-colors">Sign in to track progress</button></SignInButton>
-          </div>
-        )}
+       {!userId && <SignInCTA />}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

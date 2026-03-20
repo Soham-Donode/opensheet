@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
 import QuestionCard from "@/components/QuestionCard";
+import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 
 // Define the valid sheets (ideally this comes from DB or config)
@@ -65,11 +66,14 @@ export default async function SheetPage({ params }: { params: Promise<{ sheet: s
       </div>
 
       {!userId && questions.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-md mb-6">
-          <p className="font-semibold text-sm">You are viewing this sheet in read-only mode.</p>
-          <p className="text-xs mt-1">
-            To track your progress and save notes, please sign in.
-          </p>
+        <div className="bg-blue-50/50 dark:bg-blue-900/10 backdrop-blur-sm border border-blue-100 dark:border-blue-800/50 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="font-semibold text-blue-900 dark:text-blue-100">You are viewing this sheet in read-only mode.</p>
+            <p className="text-sm text-blue-800/70 dark:text-blue-200/60 mt-0.5">
+              To track your progress and save notes, please sign in.
+            </p>
+          </div>
+          <SignInButton mode="modal"><Button variant="glass" className="rounded-full px-8 py-2.5 h-auto text-sm font-semibold tracking-tight shadow-blue-200/20 dark:shadow-none">Sign in to start tracking</Button></SignInButton>
         </div>
       )}
 

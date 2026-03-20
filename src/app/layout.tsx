@@ -3,6 +3,7 @@ import { Manrope, Geist_Mono } from "next/font/google";
 import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs'
 import { auth } from '@clerk/nextjs/server'
 import { AppSidebar } from "@/components/AppSidebar";
+import { Button } from "@/components/ui/button";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -35,12 +36,18 @@ export default async function RootLayout({
       >
         <body className="h-screen flex flex-col m-0 p-0 overflow-hidden">
           <AppSidebar>
-            <header className="flex justify-end items-center p-4 border-b border-neutral-200 dark:border-neutral-700 w-full sticky top-0 bg-white dark:bg-neutral-900 z-10">
-              <div>
+            <header className="flex justify-end items-center px-8 py-4 border-b border-neutral-200/50 dark:border-neutral-700/50 w-full sticky top-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg z-30 transition-all duration-300">
+              <div className="flex items-center gap-4">
                 {!userId ? (
-                  <SignInButton />
+                  <SignInButton mode="modal"><Button variant="glass" className="rounded-full px-6 py-2 h-auto text-sm font-semibold tracking-tight">Sign in</Button></SignInButton>
                 ) : (
-                  <UserButton />
+                  <UserButton 
+                    appearance={{
+                      elements: {
+                        avatarBox: "h-9 w-9 border border-neutral-200 dark:border-neutral-700"
+                      }
+                    }}
+                  />
                 )}
               </div>
             </header>
