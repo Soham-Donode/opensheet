@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Geist_Mono } from "next/font/google";
-import { ClerkProvider, SignInButton, UserButton } from '@clerk/nextjs'
-import { auth } from '@clerk/nextjs/server'
+import { ClerkProvider, SignInButton, UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import "./globals.css";
@@ -18,7 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AlgoMerge – DSA Practice Tracker",
-  description: "One beautiful place to track all your DSA practice across multiple popular problem sheets.",
+  description:
+    "One beautiful place to track all your DSA practice across multiple popular problem sheets.",
 };
 
 export default async function RootLayout({
@@ -36,10 +37,10 @@ export default async function RootLayout({
       >
         <body className="h-screen flex flex-col m-0 p-0 overflow-hidden">
           <AppSidebar>
-            <header className="flex justify-end items-center px-8 py-4 border-b border-neutral-200/50 dark:border-neutral-700/50 w-full sticky top-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg z-30 transition-all duration-300">
+            <header className="flex justify-end items-center px-8 py-4  w-full sticky top-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg z-30 transition-all duration-300">
               {/* Profile moved to sidebar bottom */}
             </header>
-            <main className="flex-1 overflow-y-auto">
+            <main className="flex-1 overflow-y-auto bg-dot-matrix">
               {children}
             </main>
           </AppSidebar>

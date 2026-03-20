@@ -12,7 +12,10 @@ const SHEET_NAMES: Record<string, string> = {
   "blind-75": "Blind 75",
 };
 
-async function fetchQuestionsWithProgress(userId: string | null, sheetSlug: string) {
+async function fetchQuestionsWithProgress(
+  userId: string | null,
+  sheetSlug: string,
+) {
   return prisma.question.findMany({
     where: { sheetSlug },
     orderBy: { createdAt: "asc" },
@@ -25,11 +28,17 @@ async function fetchQuestionsWithProgress(userId: string | null, sheetSlug: stri
   });
 }
 
-type QuestionWithProgress = Awaited<ReturnType<typeof fetchQuestionsWithProgress>>[number];
+type QuestionWithProgress = Awaited<
+  ReturnType<typeof fetchQuestionsWithProgress>
+>[number];
 
-export default async function SheetPage({ params }: { params: Promise<{ sheet: string }> }) {
+export default async function SheetPage({
+  params,
+}: {
+  params: Promise<{ sheet: string }>;
+}) {
   const { sheet } = await params;
-  
+
   if (!SHEET_NAMES[sheet]) {
     notFound();
   }
@@ -47,20 +56,33 @@ export default async function SheetPage({ params }: { params: Promise<{ sheet: s
   }
 
   const solvedCount = questions.filter(
-    (q) => q.progress[0]?.isCompleted === true
+    (q) => q.progress[0]?.isCompleted === true,
   ).length;
   const totalCount = questions.length;
+  const progressPercent = totalCount > 0 ? (solvedCount / totalCount) * 100 : 0;
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">{SHEET_NAMES[sheet]}</h2>
+      <div className="mb-6">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+          {SHEET_NAMES[sheet]}
+        </h1>
         {!dbError && totalCount > 0 && (
-          <div className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-            <span className="text-green-600 font-bold">{solvedCount}</span>
-            <span className="mx-1">/</span>
-            <span>{totalCount}</span>
-            <span className="ml-1">solved</span>
+          <div className="flex items-center gap-4">
+            <div className="w-full h-2 rounded-full bg-gray-100 dark:bg-gray-800/70 overflow-hidden">
+              <div
+                className="h-full bg-green-400 dark:bg-green-500 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <div className="text-sm font-semibold whitespace-nowrap text-gray-700 dark:text-gray-200">
+              <span className="text-green-600 dark:text-green-400">
+                {solvedCount}
+              </span>
+              <span className="mx-1">/</span>
+              <span>{totalCount}</span>
+              <span className="ml-1">solved</span>
+            </div>
           </div>
         )}
       </div>
@@ -68,12 +90,21 @@ export default async function SheetPage({ params }: { params: Promise<{ sheet: s
       {!userId && questions.length > 0 && (
         <div className="bg-blue-50/50 dark:bg-blue-900/10 backdrop-blur-sm border border-blue-100 dark:border-blue-800/50 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <p className="font-semibold text-blue-900 dark:text-blue-100">You are viewing this sheet in read-only mode.</p>
+            <p className="font-semibold text-blue-900 dark:text-blue-100">
+              You are viewing this sheet in read-only mode.
+            </p>
             <p className="text-sm text-blue-800/70 dark:text-blue-200/60 mt-0.5">
               To track your progress and save notes, please sign in.
             </p>
           </div>
-          <SignInButton mode="modal"><Button variant="glass" className="rounded-full px-8 py-2.5 h-auto text-sm font-semibold tracking-tight shadow-blue-200/20 dark:shadow-none">Sign in to start tracking</Button></SignInButton>
+          <SignInButton mode="modal">
+            <Button
+              variant="glass"
+              className="rounded-full px-8 py-2.5 h-auto text-sm font-semibold tracking-tight shadow-blue-200/20 dark:shadow-none"
+            >
+              Sign in to start tracking
+            </Button>
+          </SignInButton>
         </div>
       )}
 
@@ -81,7 +112,8 @@ export default async function SheetPage({ params }: { params: Promise<{ sheet: s
         <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md mb-6">
           <p className="font-semibold">Unable to connect to the database.</p>
           <p className="text-sm mt-1">
-            Please ensure you have configured your database credentials in <code>.env.local</code> and run:
+            Please ensure you have configured your database credentials in{" "}
+            <code>.env.local</code> and run:
             <br />
             <code>npx prisma db push</code>
           </p>
@@ -90,7 +122,8 @@ export default async function SheetPage({ params }: { params: Promise<{ sheet: s
 
       {!dbError && questions.length === 0 && (
         <div className="text-gray-500 italic">
-          No questions found for this sheet. Make sure to seed the database for <code>{sheet}</code>.
+          No questions found for this sheet. Make sure to seed the database for{" "}
+          <code>{sheet}</code>.
         </div>
       )}
 
