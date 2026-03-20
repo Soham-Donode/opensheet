@@ -13,28 +13,28 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
       label: "Dashboard",
       href: "/",
       icon: (
-        <LayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <LayoutDashboard className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Striver A2Z",
       href: "/sheet/striver-a2z",
       icon: (
-        <BookOpen className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <BookOpen className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "NeetCode 150",
       href: "/sheet/neetcode-150",
       icon: (
-        <BrainCog className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <BrainCog className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Blind 75",
       href: "/sheet/blind-75",
       icon: (
-        <FolderHeart className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <FolderHeart className="text-[#666666] dark:text-neutral-400 h-5 w-5 flex-shrink-0" />
       ),
     },
   ];
@@ -49,7 +49,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-2">
+            <div className="mt-8 flex flex-col gap-2 ">
               {links.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
               ))}
@@ -79,7 +79,7 @@ export const Logo = () => {
         animate={{ opacity: 1 }}
         className="font-bold text-black dark:text-white whitespace-pre text-lg line-clamp-1"
       >
-        AlgoMerge
+        Opensheet
       </motion.span>
     </Link>
   );
