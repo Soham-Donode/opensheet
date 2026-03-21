@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, X, Plus, Minus, Sparkles } from "lucide-react";
+import { Loader2, X, Plus, Minus, Sparkles, Trash2 } from "lucide-react";
 import { generateCustomSheet, saveCustomSheet } from "@/app/custom-sheet-actions";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -48,6 +48,10 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
 
   const handleRemoveTopic = (topicToRemove: string) => {
     setTopics(topics.filter(t => t !== topicToRemove));
+  };
+
+  const handleRemoveQuestion = (indexToRemove: number) => {
+    setQuestions(questions.filter((_, i) => i !== indexToRemove));
   };
 
   const handleTopicKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -109,22 +113,34 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] font-sans bg-[#e9efea] dark:bg-neutral-900 border-neutral-200/50 dark:border-white/5 rounded-[2rem] shadow-2xl backdrop-blur-3xl overflow-hidden p-0">
+      <DialogContent className="sm:max-w-[550px] font-sans bg-[#e9efea] dark:bg-neutral-900 border-neutral-200/50 dark:border-white/5 rounded-[2rem] shadow-2xl backdrop-blur-3xl overflow-hidden p-0 [&>button]:hidden flex flex-col m-0">
         
         {/* Soft Decorative Gradient Background */}
-        <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-[#88AB8E]/20 via-transparent to-[#AFC8AD]/10 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-br from-[#88AB8E]/20 via-transparent to-[#AFC8AD]/10 pointer-events-none z-0" />
 
-        <div className="px-8 pt-8 pb-4 relative z-10">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-neutral-900 dark:text-white mb-2">
-              <Sparkles className="w-5 h-5 text-[#88AB8E]" />
-              AI Sheet Studio
-            </DialogTitle>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">Curate personalized DSA practice sheets powered by Gemini.</p>
-          </DialogHeader>
-        </div>
+        <div className="w-full h-full relative z-10 flex flex-col">
+          {/* Custom Close Button - Absolute for stability */}
+          <button 
+            onClick={() => onOpenChange(false)} 
+            className="absolute right-6 top-6 shrink-0 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-neutral-500 hover:text-neutral-900 dark:hover:text-white z-50"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-        <div className="flex flex-col gap-6 px-8 pb-8 relative z-10">
+          <div className="px-6 sm:px-8 py-8 pb-4">
+            <DialogHeader className="text-left space-y-0.5 m-0 block w-full pr-10">
+              <DialogTitle className="flex items-center gap-2 text-[22px] sm:text-2xl font-bold text-neutral-900 dark:text-white leading-tight">
+                <Sparkles className="w-5 h-5 text-[#88AB8E] shrink-0" />
+                Sheet Studio
+              </DialogTitle>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                Curate your personalized DSA practice sheets.
+              </p>
+            </DialogHeader>
+          </div>
+
+          <div className="flex flex-col gap-6 px-6 sm:px-8 pb-6 sm:pb-8">
           {error && (
             <div className="text-sm font-medium text-red-600 dark:text-red-400 bg-red-100/50 dark:bg-red-900/20 px-4 py-3 rounded-2xl border border-red-200/50 dark:border-red-900/50">
               {error}
@@ -132,9 +148,9 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
           )}
 
           {step === 1 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300 w-full m-0 p-0">
               {/* Topics Section */}
-              <div className="space-y-3">
+              <div className="space-y-3 w-full">
                 <Label className="text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-200 uppercase">Target Topics</Label>
                 
                 {/* Topic Input Box & Selected Tags */}
@@ -176,7 +192,7 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
                     <button
                       key={topic}
                       onClick={() => handleAddTopic(topic)}
-                      className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl bg-white/100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:bg-[#88AB8E] hover:text-white dark:hover:bg-[#88AB8E] dark:hover:text-white dark:hover:border-[#88AB8E] transition-all transform hover:scale-105 active:scale-95 shadow-sm"
+                      className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl bg-white dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:bg-[#88AB8E] hover:text-white dark:hover:bg-[#88AB8E] dark:hover:text-white dark:hover:border-[#88AB8E] transition-all transform hover:scale-105 active:scale-95 shadow-sm"
                     >
                       + {topic}
                     </button>
@@ -260,7 +276,7 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
           )}
 
           {step === 2 && (
-            <div className="flex flex-col items-center justify-center py-16 space-y-6 animate-in fade-in duration-500">
+            <div className="flex flex-col items-center justify-center py-16 space-y-6 animate-in fade-in duration-300 w-full m-0 p-0">
               <div className="relative">
                 <div className="absolute inset-0 bg-[#88AB8E]/20 rounded-full blur-xl animate-pulse" />
                 <div className="bg-white dark:bg-neutral-800 p-4 rounded-full shadow-2xl relative">
@@ -268,14 +284,14 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
                 </div>
               </div>
               <div className="text-center space-y-2">
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">Curating AI Sheet</h3>
-                <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Gemini is looking for the best {experienceLevel} problems...</p>
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">Curating Your Sheet</h3>
+                <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Looking for the best {experienceLevel} problems...</p>
               </div>
             </div>
           )}
 
           {step === 3 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+            <div className="space-y-6 animate-in fade-in duration-300 w-full m-0 p-0">
               <div className="space-y-3">
                 <Label htmlFor="sheetName" className="text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-200 uppercase">Name your sheet</Label>
                 <Input
@@ -293,11 +309,15 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
                   <span className="bg-[#88AB8E]/10 text-[#88AB8E] px-2 py-0.5 rounded-lg text-xs font-bold">{questions.length} total</span>
                 </Label>
                 <div className="max-h-[220px] overflow-y-auto border border-neutral-200 dark:border-white/10 rounded-2xl p-4 bg-white/50 dark:bg-black/20 space-y-3 shadow-inner custom-scrollbar">
-                  {questions.map((q, i) => (
-                    <div key={i} className="text-sm flex items-start gap-3 p-2 hover:bg-white dark:hover:bg-white/5 rounded-xl transition-colors group">
-                      <span className="text-neutral-400 font-bold min-w-[20px] pt-0.5">{i + 1}.</span>
+                  {questions.length === 0 ? (
+                    <div className="text-center py-6 text-neutral-500 text-sm italic">
+                      No questions left. Add some topics and generate again.
+                    </div>
+                  ) : questions.map((q, i) => (
+                    <div key={i} className="text-sm flex items-start gap-3 p-3 hover:bg-white dark:hover:bg-white/5 rounded-xl transition-colors group relative pr-10">
+                      <span className="text-neutral-400 font-bold min-w-[20px] pt-0.5 text-xs">{i + 1}.</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 truncate group-hover:text-[#88AB8E] transition-colors">{q.title}</p>
+                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-[#88AB8E] transition-colors leading-snug whitespace-normal break-words">{q.title}</p>
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                           <span className={cn(
                             "text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md font-bold",
@@ -314,6 +334,13 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
                           ))}
                         </div>
                       </div>
+                      <button
+                        onClick={() => handleRemoveQuestion(i)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-red-500/70 hover:text-red-500 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                        title="Remove question"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -323,13 +350,14 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
                 <Button variant="outline" className="flex-1 rounded-2xl h-14 text-base font-bold bg-transparent border-neutral-300 dark:border-white/10 hover:bg-neutral-100 dark:hover:bg-white/5" onClick={() => setStep(1)} disabled={loading}>
                   Back Edit
                 </Button>
-                <Button className="flex-1 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 rounded-2xl h-14 text-base font-bold shadow-lg transition-all" onClick={handleSave} disabled={loading}>
+                <Button className="flex-1 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 rounded-2xl h-14 text-base font-bold shadow-lg transition-all" onClick={handleSave} disabled={loading || questions.length === 0}>
                   {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
                   Save to Workspace
                 </Button>
               </div>
             </div>
           )}
+          </div>
         </div>
         
         {/* Global Styles for Shimmer & Scrollbar */}

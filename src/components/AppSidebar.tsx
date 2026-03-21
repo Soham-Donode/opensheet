@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -49,11 +49,31 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
   const [open, setOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   
+  const pathname = usePathname();
+  const router = useRouter();
   const [renameOpen, setRenameOpen] = useState(false);
   const [sheetToRename, setSheetToRename] = useState<any>(null);
   const [newName, setNewName] = useState("");
 
-  const pathname = usePathname();
+  const handleDeleteSheet = async (id: string, href: string) => {
+    if (pathname === href) {
+      const currentIndex = customLists.findIndex(l => l.href === href);
+      let nextPath = "/"; // Default to dashboard
+
+      if (customLists.length > 1) {
+        // If there's another custom sheet, go to it
+        const nextSheet = customLists[currentIndex + 1] || customLists[currentIndex - 1];
+        if (nextSheet) nextPath = nextSheet.href;
+      } else if (popularLists.length > 1) {
+        // Fallback to the first main sheet (Striver A2Z)
+        nextPath = popularLists[1].href;
+      }
+      
+      router.push(nextPath);
+    }
+    
+    await deleteUserSheet(id);
+  };
   const popularLists = [
     {
       label: "Dashboard",
@@ -192,7 +212,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 className="cursor-pointer font-medium text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
-                                onClick={() => deleteUserSheet(link.id)}
+                                onClick={() => handleDeleteSheet(link.id, link.href)}
                               >
                                 <Trash className="mr-2 h-4 w-4" /> Delete
                               </DropdownMenuItem>
