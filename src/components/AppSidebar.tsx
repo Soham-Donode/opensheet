@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CreateSheetDialog } from "@/components/CreateSheetDialog";
+import { StreakTracker } from "@/components/StreakTracker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -301,7 +302,8 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2 pt-4 border-t border-neutral-200/50 dark:border-white/10">
+          <div className="flex flex-col gap-2 pt-4 pb-2 border-t border-neutral-200/50 dark:border-white/10 shrink-0">
+            <StreakTracker expanded={open} />
             <UserSection />
           </div>
         </SidebarBody>

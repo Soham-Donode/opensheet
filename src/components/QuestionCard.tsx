@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SaveQuestionDialog } from "./SaveQuestionDialog";
+import { STREAK_UPDATE_EVENT } from "./StreakTracker";
 
 interface QuestionCardProps {
   question: {
@@ -57,6 +58,8 @@ export default function QuestionCard({
     (completedStatus: boolean, newNotes: string) => {
       startTransition(async () => {
         await updateProgress(question.id, completedStatus, newNotes);
+        // Explicitly tell the client-side StreakTracker to refresh
+        window.dispatchEvent(new Event(STREAK_UPDATE_EVENT));
       });
     },
     [question.id],
