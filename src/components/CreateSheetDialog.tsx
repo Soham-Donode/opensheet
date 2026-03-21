@@ -5,42 +5,74 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, X, Plus, Minus, Sparkles } from "lucide-react";
 import { generateCustomSheet, saveCustomSheet } from "@/app/custom-sheet-actions";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface CreateSheetDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+const COMMON_TOPICS = [
+  "Arrays", "Strings", "Linked List", "Trees", 
+  "Graphs", "DP", "Greedy", "Recursion", "Binary Search", 
+  "Two Pointers", "Sliding Window", "Backtracking"
+];
+
+const EXPERIENCE_LEVELS = ["Beginner", "Intermediate", "Advanced"];
+
 export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [topics, setTopics] = useState("");
+  
+  // Refined State
+  const [topics, setTopics] = useState<string[]>([]);
+  const [topicInput, setTopicInput] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("Intermediate");
-  const [maxQuestions, setMaxQuestions] = useState("15");
+  const [maxQuestions, setMaxQuestions] = useState(15);
+  
   const [sheetName, setSheetName] = useState("");
   const [questions, setQuestions] = useState<any[]>([]);
   const [error, setError] = useState("");
 
+  const handleAddTopic = (topic: string) => {
+    const t = topic.trim();
+    if (t && !topics.includes(t)) {
+      setTopics([...topics, t]);
+    }
+    setTopicInput("");
+  };
+
+  const handleRemoveTopic = (topicToRemove: string) => {
+    setTopics(topics.filter(t => t !== topicToRemove));
+  };
+
+  const handleTopicKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTopic(topicInput);
+    }
+  };
+
   const handleGenerate = async () => {
-    if (!topics.trim()) {
-      setError("Please enter at least one topic.");
+    if (topics.length === 0) {
+      setError("Please select or enter at least one topic.");
       return;
     }
     setError("");
     setLoading(true);
     setStep(2);
 
-    const res = await generateCustomSheet(topics, experienceLevel, parseInt(maxQuestions) || 15);
+    const topicsString = topics.join(", ");
+    const res = await generateCustomSheet(topicsString, experienceLevel, maxQuestions);
     setLoading(false);
 
     if (res.success && res.questions) {
       setQuestions(res.questions);
-      setSheetName(`${experienceLevel} ${topics.split(',')[0].trim()} Sheet`);
+      setSheetName(`${experienceLevel} ${topics[0]} Sheet`);
       setStep(3);
     } else {
       setError(res.error || "Generation failed.");
@@ -64,7 +96,8 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
       // Reset state for next time
       setTimeout(() => {
         setStep(1);
-        setTopics("");
+        setTopics([]);
+        setTopicInput("");
         setQuestions([]);
         setSheetName("");
       }, 500);
@@ -74,121 +107,211 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
     }
   };
 
-  const commonTopics = [
-    "Arrays", "Strings", "Linked List", "Trees", 
-    "Graphs", "DP", "Greedy", "Recursion", "Binary Search"
-  ];
-
-  const handleTopicClick = (topic: string) => {
-    const currentTopics = topics.split(",").map(t => t.trim()).filter(t => t !== "");
-    if (!currentTopics.includes(topic)) {
-      setTopics(topics ? `${topics}, ${topic}` : topic);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-[#e9efea] dark:bg-neutral-800 border-neutral-200/50 dark:border-white/10 rounded-3xl shadow-2xl backdrop-blur-xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-serif text-neutral-900 dark:text-white">Create Custom Sheet</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[550px] font-sans bg-[#e9efea] dark:bg-neutral-900 border-neutral-200/50 dark:border-white/5 rounded-[2rem] shadow-2xl backdrop-blur-3xl overflow-hidden p-0">
+        
+        {/* Soft Decorative Gradient Background */}
+        <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-[#88AB8E]/20 via-transparent to-[#AFC8AD]/10 pointer-events-none" />
 
-        <div className="flex flex-col gap-6 py-4">
-          {error && <div className="text-sm font-medium text-red-500 bg-red-100/50 dark:bg-red-900/20 p-3 rounded-xl">{error}</div>}
+        <div className="px-8 pt-8 pb-4 relative z-10">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-neutral-900 dark:text-white mb-2">
+              <Sparkles className="w-5 h-5 text-[#88AB8E]" />
+              AI Sheet Studio
+            </DialogTitle>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">Curate personalized DSA practice sheets powered by Gemini.</p>
+          </DialogHeader>
+        </div>
+
+        <div className="flex flex-col gap-6 px-8 pb-8 relative z-10">
+          {error && (
+            <div className="text-sm font-medium text-red-600 dark:text-red-400 bg-red-100/50 dark:bg-red-900/20 px-4 py-3 rounded-2xl border border-red-200/50 dark:border-red-900/50">
+              {error}
+            </div>
+          )}
 
           {step === 1 && (
-            <>
-              <div className="space-y-5">
-                <div className="space-y-3">
-                  <Label htmlFor="topics" className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Target Topics</Label>
-                  <Input
-                    id="topics"
-                    placeholder="e.g. Arrays, Graphs..."
-                    value={topics}
-                    onChange={(e) => setTopics(e.target.value)}
-                    className="bg-white/50 dark:bg-black/20 border-neutral-200 dark:border-white/5 h-12 rounded-xl focus:ring-[#4361EE]"
-                  />
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {commonTopics.map(topic => (
-                      <button
-                        key={topic}
-                        onClick={() => handleTopicClick(topic)}
-                        className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-white/80 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:bg-[#4361EE] hover:text-white dark:hover:bg-[#4361EE] dark:hover:text-white transition-all transform hover:scale-105 active:scale-95 shadow-sm"
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Topics Section */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-200 uppercase">Target Topics</Label>
+                
+                {/* Topic Input Box & Selected Tags */}
+                <div className="min-h-14 p-2 bg-white/60 dark:bg-black/20 border border-neutral-200 dark:border-white/5 rounded-2xl flex flex-wrap gap-2 items-center focus-within:ring-2 focus-within:ring-[#88AB8E]/50 transition-all">
+                  {topics.map(topic => (
+                    <span key={topic} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#88AB8E] text-white text-xs font-semibold rounded-xl shadow-sm animate-in zoom-in-75 duration-200">
+                      {topic}
+                      <button 
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveTopic(topic); }} 
+                        className="hover:bg-black/20 rounded-full p-0.5 transition-colors"
                       >
-                        {topic}
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={topicInput}
+                    onChange={(e) => setTopicInput(e.target.value)}
+                    onKeyDown={handleTopicKeyDown}
+                    placeholder={topics.length === 0 ? "Type a topic and press Enter..." : "Add another..."}
+                    className="flex-1 min-w-[120px] bg-transparent border-none text-sm outline-none px-2 text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400"
+                  />
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleAddTopic(topicInput)}
+                    className="h-8 rounded-lg text-[#88AB8E] hover:bg-[#88AB8E]/10"
+                    disabled={!topicInput.trim()}
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {/* Popular Topics Quick Action */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {COMMON_TOPICS.filter(t => !topics.includes(t)).map(topic => (
+                    <button
+                      key={topic}
+                      onClick={() => handleAddTopic(topic)}
+                      className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl bg-white/100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:bg-[#88AB8E] hover:text-white dark:hover:bg-[#88AB8E] dark:hover:text-white dark:hover:border-[#88AB8E] transition-all transform hover:scale-105 active:scale-95 shadow-sm"
+                    >
+                      + {topic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Experience Level */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-200 uppercase">Experience Level</Label>
+                <div className="flex gap-2 p-1.5 bg-white/60 dark:bg-black/20 rounded-2xl border border-neutral-200 dark:border-white/5">
+                  {EXPERIENCE_LEVELS.map(level => (
+                    <button
+                      key={level}
+                      onClick={() => setExperienceLevel(level)}
+                      className={cn(
+                        "flex-1 py-2.5 text-sm font-semibold rounded-[14px] transition-all duration-300",
+                        experienceLevel === level 
+                          ? "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-[0_2px_10px_rgba(0,0,0,0.06)]" 
+                          : "text-neutral-500 hover:text-[#88AB8E] dark:hover:text-[#88AB8E] hover:bg-white/40 dark:hover:bg-white/5"
+                      )}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Max Questions Slider/Counter Custom Look */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-200 uppercase">Total Questions</Label>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center bg-white/60 dark:bg-black/20 border border-neutral-200 dark:border-white/5 rounded-2xl p-1 shadow-sm">
+                    <button 
+                      onClick={() => setMaxQuestions(Math.max(5, maxQuestions - 5))}
+                      className="p-2.5 rounded-xl hover:bg-neutral-200/50 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-400 transition-colors"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <div className="w-16 text-center text-lg font-bold text-neutral-800 dark:text-neutral-100">
+                      {maxQuestions}
+                    </div>
+                    <button 
+                      onClick={() => setMaxQuestions(Math.min(50, maxQuestions + 5))}
+                      className="p-2.5 rounded-xl hover:bg-neutral-200/50 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-400 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    {[10, 20, 50].map(preset => (
+                      <button
+                        key={preset}
+                        onClick={() => setMaxQuestions(preset)}
+                        className={cn(
+                          "px-4 py-2 rounded-2xl text-sm font-bold transition-all border shadow-sm",
+                          maxQuestions === preset
+                            ? "bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-900"
+                            : "bg-white/80 border-neutral-200 text-neutral-600 dark:bg-white/5 dark:border-white/10 dark:text-neutral-400 hover:bg-white dark:hover:bg-white/10"
+                        )}
+                      >
+                        {preset}
                       </button>
                     ))}
                   </div>
                 </div>
-                
-                <div className="space-y-3">
-                  <Label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Experience Level</Label>
-                  <Select value={experienceLevel} onValueChange={setExperienceLevel}>
-                    <SelectTrigger className="bg-white/50 dark:bg-black/20 border-neutral-200 dark:border-white/5 h-12 rounded-xl">
-                      <SelectValue placeholder="Select level" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-neutral-200 dark:border-white/10">
-                      <SelectItem value="Beginner">Beginner</SelectItem>
-                      <SelectItem value="Intermediate">Intermediate</SelectItem>
-                      <SelectItem value="Advanced">Advanced</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3">
-                  <Label htmlFor="maxQuestions" className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Question Count (5-50)</Label>
-                  <Input
-                    id="maxQuestions"
-                    type="number"
-                    min="5"
-                    max="50"
-                    value={maxQuestions}
-                    onChange={(e) => setMaxQuestions(e.target.value)}
-                    className="bg-white/50 dark:bg-black/20 border-neutral-200 dark:border-white/5 h-12 rounded-xl"
-                  />
-                </div>
               </div>
-              <Button onClick={handleGenerate} className="w-full bg-[#4361EE] hover:bg-[#324BCC] text-white rounded-2xl h-14 text-lg font-bold shadow-lg shadow-[#4361EE]/20 transition-all hover:translate-y-[-2px] active:translate-y-0">
-                Generate with AI
-              </Button>
-            </>
+
+              <div className="pt-2">
+                <Button 
+                  onClick={handleGenerate} 
+                  className="w-full relative overflow-hidden group bg-[#88AB8E] hover:bg-[#6E8E75] text-white rounded-2xl h-14 text-base font-bold shadow-[0_8px_20px_rgba(136,171,142,0.25)] transition-all hover:translate-y-[-2px] active:translate-y-px"
+                >
+                  <div className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                  <span className="flex items-center justify-center gap-2">
+                    Generate Practice Sheet <Sparkles className="w-4 h-4" />
+                  </span>
+                </Button>
+              </div>
+            </div>
           )}
 
           {step === 2 && (
-            <div className="flex flex-col items-center justify-center py-10 space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin text-[#4361EE]" />
-              <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 animate-pulse">Curating your custom sheet using Gemini...</p>
+            <div className="flex flex-col items-center justify-center py-16 space-y-6 animate-in fade-in duration-500">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#88AB8E]/20 rounded-full blur-xl animate-pulse" />
+                <div className="bg-white dark:bg-neutral-800 p-4 rounded-full shadow-2xl relative">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#88AB8E]" />
+                </div>
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">Curating AI Sheet</h3>
+                <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Gemini is looking for the best {experienceLevel} problems...</p>
+              </div>
             </div>
           )}
 
           {step === 3 && (
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="sheetName">Name your sheet</Label>
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+              <div className="space-y-3">
+                <Label htmlFor="sheetName" className="text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-200 uppercase">Name your sheet</Label>
                 <Input
                   id="sheetName"
                   value={sheetName}
                   onChange={(e) => setSheetName(e.target.value)}
-                  className="bg-neutral-50 dark:bg-[#0b0b0b]"
+                  className="bg-white/80 dark:bg-black/20 border-neutral-200 dark:border-white/10 h-14 rounded-2xl text-lg font-medium focus:ring-[#88AB8E]/50"
+                  autoFocus
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Preview ({questions.length} questions)</Label>
-                <div className="max-h-[200px] overflow-y-auto border border-neutral-200 dark:border-white/10 rounded-xl p-3 bg-neutral-50 dark:bg-[#0b0b0b] space-y-2">
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-200 uppercase flex items-center justify-between">
+                  <span>Questions Preview</span>
+                  <span className="bg-[#88AB8E]/10 text-[#88AB8E] px-2 py-0.5 rounded-lg text-xs font-bold">{questions.length} total</span>
+                </Label>
+                <div className="max-h-[220px] overflow-y-auto border border-neutral-200 dark:border-white/10 rounded-2xl p-4 bg-white/50 dark:bg-black/20 space-y-3 shadow-inner custom-scrollbar">
                   {questions.map((q, i) => (
-                    <div key={i} className="text-sm flex items-start gap-2">
-                      <span className="text-neutral-400 font-medium min-w-[20px]">{i + 1}.</span>
+                    <div key={i} className="text-sm flex items-start gap-3 p-2 hover:bg-white dark:hover:bg-white/5 rounded-xl transition-colors group">
+                      <span className="text-neutral-400 font-bold min-w-[20px] pt-0.5">{i + 1}.</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-neutral-700 dark:text-neutral-300 truncate">{q.title}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-medium ${
-                            q.difficulty === 'Easy' ? 'bg-green-100/50 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                            q.difficulty === 'Medium' ? 'bg-yellow-100/50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                            'bg-red-100/50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                          }`}>
+                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 truncate group-hover:text-[#88AB8E] transition-colors">{q.title}</p>
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          <span className={cn(
+                            "text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md font-bold",
+                            q.difficulty === 'Easy' ? 'bg-emerald-100/80 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                            q.difficulty === 'Medium' ? 'bg-amber-100/80 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400' :
+                            'bg-rose-100/80 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
+                          )}>
                             {q.difficulty}
                           </span>
+                          {q.topics && q.topics.slice(0, 2).map((t: string) => (
+                            <span key={t} className="text-[10px] text-neutral-500 bg-neutral-200/50 dark:bg-white/5 px-1.5 py-0.5 rounded-md truncate max-w-[80px]">
+                              {t}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -196,18 +319,38 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setStep(1)} disabled={loading}>
-                  Back
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" className="flex-1 rounded-2xl h-14 text-base font-bold bg-transparent border-neutral-300 dark:border-white/10 hover:bg-neutral-100 dark:hover:bg-white/5" onClick={() => setStep(1)} disabled={loading}>
+                  Back Edit
                 </Button>
-                <Button className="flex-1 bg-[#4361EE] hover:bg-[#324BCC] text-white rounded-xl h-11" onClick={handleSave} disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Sheet
+                <Button className="flex-1 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 rounded-2xl h-14 text-base font-bold shadow-lg transition-all" onClick={handleSave} disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+                  Save to Workspace
                 </Button>
               </div>
             </div>
           )}
         </div>
+        
+        {/* Global Styles for Shimmer & Scrollbar */}
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes shimmer {
+            100% { transform: translateX(100%); }
+          }
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.3);
+            border-radius: 10px;
+          }
+          .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+        `}} />
       </DialogContent>
     </Dialog>
   );
