@@ -11,9 +11,14 @@ import {
   BrainCog,
   FolderHeart,
   LayoutDashboard,
+  Plus,
+  FileText,
+  Pin,
+  Trash,
+  Pencil,
+  MoreVertical,
   PanelLeft,
   LogIn,
-  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,9 +28,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CreateSheetDialog } from "@/components/CreateSheetDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { togglePinUserSheet, deleteUserSheet, renameUserSheet } from "@/app/custom-sheet-actions";
 
-export function AppSidebar({ children }: { children: React.ReactNode }) {
+export function AppSidebar({ children, customSheets = [] }: { children: React.ReactNode, customSheets?: any[] }) {
   const [open, setOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [sheetToRename, setSheetToRename] = useState<any>(null);
+  const [newName, setNewName] = useState("");
+
   const pathname = usePathname();
   const popularLists = [
     {
@@ -58,9 +85,20 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     },
   ];
 
-  const customLists: any[] = [];
+  const customLists = (customSheets || []).map(sheet => ({
+    id: sheet.id,
+    label: sheet.name,
+    href: `/sheet/${sheet.slug}`,
+    icon: sheet.isPinned ? (
+      <Pin className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+    ) : (
+      <FileText className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+    ),
+    isPinned: sheet.isPinned,
+  }));
 
   return (
+    <>
     <div
       className={cn(
         "flex flex-col md:flex-row dark:bg-[#030303] w-full flex-1 overflow-x-hidden md:overflow-hidden h-auto md:h-screen",
@@ -114,6 +152,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   <AnimatePresence mode="wait">
                     {open && (
                       <motion.button
+                        onClick={() => setCreateOpen(true)}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
@@ -125,16 +164,47 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   </AnimatePresence>
                 </div>
                 <div className="flex flex-col gap-1">
-                  {customLists.map((link, idx) => (
-                    <SidebarLink
-                      key={idx}
-                      link={link}
-                      active={pathname === link.href}
-                    />
+                  {customLists.map((link) => (
+                    <div key={link.id} className="relative group/custom">
+                      <SidebarLink
+                        link={link}
+                        active={pathname === link.href}
+                        className={open ? "pr-8" : ""}
+                      />
+                      {open && (
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/custom:opacity-100 transition-opacity">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-6 w-6 p-0 hover:bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-36">
+                              <DropdownMenuItem className="cursor-pointer font-medium" onClick={() => togglePinUserSheet(link.id, !link.isPinned)}>
+                                <Pin className="mr-2 h-4 w-4" /> {link.isPinned ? "Unpin Sheet" : "Pin Sheet"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer font-medium" onClick={() => {
+                                setSheetToRename(link);
+                                setNewName(link.label);
+                                setRenameOpen(true);
+                              }}>
+                                <Pencil className="mr-2 h-4 w-4" /> Rename
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="cursor-pointer font-medium text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                                onClick={() => deleteUserSheet(link.id)}
+                              >
+                                <Trash className="mr-2 h-4 w-4" /> Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+                    </div>
                   ))}
                   {open && customLists.length === 0 && (
                     <p className="px-3 text-[11px] text-neutral-400/60 dark:text-neutral-500/50 italic py-1">
-                      No custom lists yet
+                      No custom sheets yet
                     </p>
                   )}
                 </div>
@@ -152,6 +222,32 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     </div>
+
+    <CreateSheetDialog open={createOpen} onOpenChange={setCreateOpen} />
+
+    <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
+      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-serif">Rename Sheet</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <Input 
+            value={newName} 
+            onChange={(e) => setNewName(e.target.value)} 
+            placeholder="Sheet name..." 
+            autoFocus
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setRenameOpen(false)}>Cancel</Button>
+          <Button className="bg-[#4361EE] hover:bg-[#324BCC] text-white" onClick={() => {
+            if (newName.trim()) renameUserSheet(sheetToRename.id, newName.trim());
+            setRenameOpen(false);
+          }}>Save</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 

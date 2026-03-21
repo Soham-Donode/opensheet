@@ -23,12 +23,26 @@ export const metadata: Metadata = {
     "One beautiful place to track all your DSA practice across multiple popular problem sheets.",
 };
 
+import prisma from "@/lib/prisma";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const { userId } = await auth();
+  
+  let customSheets: any[] = [];
+  if (userId) {
+    try {
+      customSheets = await prisma.userSheet.findMany({
+        where: { userId },
+        orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
+      });
+    } catch (e) {
+      console.error("Failed to fetch custom sheets:", e);
+    }
+  }
 
   return (
     <ClerkProvider>
@@ -53,7 +67,7 @@ export default async function RootLayout({
         </head>
         <body className="h-full md:h-screen flex flex-col m-0 p-0 overflow-x-hidden md:overflow-hidden">
           <ThemeProvider>
-            <AppSidebar>
+            <AppSidebar customSheets={customSheets}>
               <main className="flex-1 overflow-y-auto bg-dot-matrix">
                 {children}
               </main>

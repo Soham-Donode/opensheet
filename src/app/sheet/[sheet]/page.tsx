@@ -39,8 +39,18 @@ export default async function SheetPage({
 }) {
   const { sheet } = await params;
 
-  if (!SHEET_NAMES[sheet]) {
-    notFound();
+  let sheetName = SHEET_NAMES[sheet];
+
+  if (!sheetName) {
+    const customSheet = await prisma.userSheet.findUnique({
+      where: { slug: sheet },
+      select: { name: true }
+    });
+    if (customSheet) {
+      sheetName = customSheet.name;
+    } else {
+      notFound();
+    }
   }
 
   const { userId } = await auth();
@@ -82,7 +92,7 @@ export default async function SheetPage({
     <div className="p-8 max-w-4xl mx-auto w-full">
       <div className="mb-6">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-          {SHEET_NAMES[sheet]}
+          {sheetName}
         </h1>
         {!dbError && totalCount > 0 && (
           <div className="flex items-center gap-4">
