@@ -115,19 +115,19 @@ export default async function SheetPage({
       </div>
 
       {!userId && questions.length > 0 && (
-        <div className="bg-blue-50/50 dark:bg-blue-900/10 backdrop-blur-sm border border-blue-100 dark:border-blue-800/50 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-[#88AB8E]/5 dark:bg-[#88AB8E]/10 backdrop-blur-sm border border-[#88AB8E]/20 dark:border-[#88AB8E]/30 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <p className="font-semibold text-blue-900 dark:text-blue-100">
+            <p className="font-semibold text-[#4A644F] dark:text-[#E2EBE4]">
               You are viewing this sheet in read-only mode.
             </p>
-            <p className="text-sm text-blue-800/70 dark:text-blue-200/60 mt-0.5">
+            <p className="text-sm text-[#6E8E75]/80 dark:text-[#AFC8AD]/80 mt-0.5">
               To track your progress and save notes, please sign in.
             </p>
           </div>
           <SignInButton mode="modal">
             <Button
               variant="glass"
-              className="rounded-full px-8 py-2.5 h-auto text-sm font-semibold tracking-tight shadow-blue-200/20 dark:shadow-none"
+              className="rounded-full px-8 py-2.5 h-auto text-sm font-semibold tracking-tight shadow-[#88AB8E]/20 dark:shadow-none"
             >
               Sign in to start tracking
             </Button>
@@ -167,7 +167,7 @@ export default async function SheetPage({
             return (
               <details
                 key={topic}
-                className="group rounded-2xl border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-[#272627]/50 p-4"
+                className="group rounded-2xl border border-gray-200 dark:border-white/10 bg-[#e9efea] dark:bg-[#272627]/50 p-4"
               >
                 <summary className="flex items-center justify-between cursor-pointer select-none">
                   <div>

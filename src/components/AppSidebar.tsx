@@ -244,7 +244,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
         </SidebarBody>
       </Sidebar>
       <div className="flex-1 p-1 md:p-2 bg-[#e9efea]/50 dark:bg-[#262626] min-h-0">
-        <div className="flex flex-col w-full h-full bg-white dark:bg-[#1f1f1f] border border-neutral-200 dark:border-white/10 rounded-2xl md:rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none overflow-hidden relative">
+        <div className="flex flex-col w-full h-full bg-[#f4f7f5] dark:bg-[#171717] border border-neutral-200 dark:border-white/10 rounded-2xl md:rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none overflow-hidden relative">
           {children}
         </div>
       </div>

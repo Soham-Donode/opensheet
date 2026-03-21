@@ -90,14 +90,14 @@ export default async function Home() {
       description:
         "Master the most frequently asked problems logically step-by-step.",
       href: "/sheet/striver-a2z",
-      icon: <BookOpen className="w-8 h-8 text-[#4361EE] dark:text-[#4361EE]" />,
+      icon: <BookOpen className="w-8 h-8 text-[#88AB8E] dark:text-[#88AB8E]" />,
     },
     {
       title: "NeetCode 150",
       description:
         "A curated list of leetcode problems to ace your technical interviews.",
       href: "/sheet/neetcode-150",
-      icon: <BrainCog className="w-8 h-8 text-[#4361EE] dark:text-[#4361EE]" />,
+      icon: <BrainCog className="w-8 h-8 text-[#88AB8E] dark:text-[#88AB8E]" />,
     },
     {
       title: "Blind 75",
@@ -105,7 +105,7 @@ export default async function Home() {
         "The classic collection of 75 essential algorithmic problems.",
       href: "/sheet/blind-75",
       icon: (
-        <FolderHeart className="w-8 h-8 text-[#4361EE] dark:text-[#4361EE]" />
+        <FolderHeart className="w-8 h-8 text-[#88AB8E] dark:text-[#88AB8E]" />
       ),
     },
   ];
@@ -118,28 +118,28 @@ export default async function Home() {
         <div className="absolute inset-0 w-full h-full pointer-events-none select-none max-w-300 mx-auto overflow-visible">
           {/* Top Left Area */}
           <Star className="absolute top-[18%] left-[18%] text-amber-400 w-8 h-8 rotate-15 stroke-2 fill-amber-400/20" />
-          <Pencil className="absolute top-[22%] left-[28%] text-[#4361EE] w-7 h-7 -rotate-12 stroke-2" />
+          <Pencil className="absolute top-[22%] left-[28%] text-[#88AB8E] w-7 h-7 -rotate-12 stroke-2" />
 
           {/* Mid Left Area */}
-          <Package className="absolute top-[45%] left-[8%] text-[#4361EE] w-20 h-20 rotate-6 stroke-[1.5]" />
-          <Squiggle className="absolute top-[58%] left-[22%] text-[#4361EE] -rotate-6" />
+          <Package className="absolute top-[45%] left-[8%] text-[#88AB8E] w-20 h-20 rotate-6 stroke-[1.5]" />
+          <Squiggle className="absolute top-[58%] left-[22%] text-[#88AB8E] -rotate-6" />
 
           {/* Bottom Left Area */}
-          <div className="absolute bottom-[28%] left-[14%] w-3 h-3 rounded-full bg-[#4361EE]" />
-          <DocumentIcon className="absolute bottom-[15%] left-[25%] text-[#4361EE] -rotate-12" />
+          <div className="absolute bottom-[28%] left-[14%] w-3 h-3 rounded-full bg-[#88AB8E]" />
+          <DocumentIcon className="absolute bottom-[15%] left-[25%] text-[#88AB8E] -rotate-12" />
           <Star className="absolute bottom-[12%] left-[38%] text-amber-400 w-5 h-5 -rotate-6 stroke-[2.5]" />
 
           {/* Top Right Area */}
-          <div className="absolute top-[20%] right-[28%] w-3 h-3 rounded-full bg-[#4361EE]" />
-          <Dashes className="absolute top-[18%] right-[10%] text-[#4361EE] rotate-12 w-10 h-10" />
-          <Mail className="absolute top-[32%] right-[15%] text-[#4361EE] w-20 h-20 rotate-12 stroke-[1.5]" />
+          <div className="absolute top-[20%] right-[28%] w-3 h-3 rounded-full bg-[#88AB8E]" />
+          <Dashes className="absolute top-[18%] right-[10%] text-[#88AB8E] rotate-12 w-10 h-10" />
+          <Mail className="absolute top-[32%] right-[15%] text-[#88AB8E] w-20 h-20 rotate-12 stroke-[1.5]" />
 
           {/* Mid Right Area */}
-          <div className="absolute top-[55%] right-[22%] w-2.5 h-2.5 rounded-full bg-[#4361EE]" />
+          <div className="absolute top-[55%] right-[22%] w-2.5 h-2.5 rounded-full bg-[#88AB8E]" />
           <Heart className="absolute top-[50%] right-[8%] text-[#F94144] w-12 h-12 -rotate-12 stroke-2 fill-white dark:fill-[#0B0B0B]" />
 
           {/* Bottom Right Area */}
-          <Mailbox className="absolute bottom-[20%] right-[18%] text-[#4361EE] w-24 h-24 rotate-6 stroke-[1.5]" />
+          <Mailbox className="absolute bottom-[20%] right-[18%] text-[#88AB8E] w-24 h-24 rotate-6 stroke-[1.5]" />
           <Star className="absolute bottom-[10%] right-[12%] text-amber-400 w-7 h-7 rotate-45 stroke-[2.5]" />
         </div>
 
@@ -165,7 +165,7 @@ export default async function Home() {
             {userId ? (
               <Button
                 asChild
-                className="rounded-full px-10 py-7 text-lg font-medium bg-[#4361EE] hover:bg-[#324BCC] text-white transition-all shadow-[0_8px_20px_rgba(67,97,238,0.25)] border-none"
+                className="rounded-full px-10 py-7 text-lg font-medium bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none"
               >
                 <Link href="/sheet/striver-a2z">
                   Go to Dashboard <ArrowRight className="ml-2 w-5 h-5" />
@@ -173,7 +173,7 @@ export default async function Home() {
               </Button>
             ) : (
               <SignInButton mode="modal">
-                <Button className="rounded-full px-10 py-7 text-lg font-medium bg-[#4361EE] hover:bg-[#324BCC] text-white transition-all shadow-[0_8px_20px_rgba(67,97,238,0.25)] border-none">
+                <Button className="rounded-full px-10 py-7 text-lg font-medium bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none">
                   Start Tracking <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </SignInButton>
@@ -201,7 +201,7 @@ export default async function Home() {
             <Link
               key={sheet.href}
               href={sheet.href}
-              className="group p-8 rounded-[1.5rem] border border-neutral-200/60 dark:border-white/10 hover:border-[#4361EE]/50 bg-white/70 dark:bg-[#0B0B0B]/80 backdrop-blur-sm transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-none hover:-translate-y-1 content-start"
+              className="group p-8 rounded-[1.5rem] border border-neutral-200/60 dark:border-white/10 hover:border-[#88AB8E]/50 bg-white/70 dark:bg-[#0B0B0B]/80 backdrop-blur-sm transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-none hover:-translate-y-1 content-start"
             >
               <div className="bg-neutral-100 dark:bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 {sheet.icon}

@@ -95,7 +95,7 @@ export default function QuestionCard({
   return (
     <>
       <div
-        className={`relative p-4 border rounded-lg bg-white dark:bg-[#272627] dark:border-slate-700 transition-all duration-200 flex items-center justify-between gap-4 
+        className={`relative p-4 border rounded-lg bg-[#f4f7f5] dark:bg-[#272627] dark:border-slate-700 transition-all duration-200 flex items-center justify-between gap-4 
         
         `}
       >
@@ -149,7 +149,7 @@ export default function QuestionCard({
       {/* Notes Modal */}
       {showNotesModal && (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/60 rounded-2xl flex items-center justify-center z-50 p-4">
-          <div className="bg-[#e9efea] dark:bg-[#030303] rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col border border-gray-300 dark:border-white/10">
+          <div className="bg-[#e9efea] dark:bg-neutral-900 rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col border border-gray-300 dark:border-white/10">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
               <div>
@@ -174,20 +174,18 @@ export default function QuestionCard({
                 value={notes}
                 onChange={handleNotesChange}
                 onBlur={handleNotesBlur}
-                placeholder="Write your notes here... (solution approach, key insights, mistakes to avoid, etc.)"
-                rows={10}
-                className="w-full text-sm px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                className="w-full text-sm px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-[#88AB8E] dark:focus:ring-[#88AB8E]/50 focus:border-transparent"
               />
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-white/10 bg-[#e9efea] dark:bg-[#030303] rounded-2xl">
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-white/10 bg-[#e9efea] dark:bg-neutral-900 rounded-b-2xl">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Auto-saved
               </p>
               <Button
                 onClick={() => setShowNotesModal(false)}
-                className="bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 text-white"
+                className="bg-[#88AB8E] dark:bg-[#88AB8E] hover:bg-[#6E8E75] dark:hover:bg-[#6E8E75] text-white"
               >
                 Done
               </Button>
