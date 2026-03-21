@@ -18,6 +18,7 @@ interface QuestionCardProps {
   };
   isCompleted: boolean;
   initialNotes: string;
+  onToggleComplete?: (isCompleted: boolean) => void;
 }
 
 const DIFFICULTY_STYLES: Record<string, string> = {
@@ -31,6 +32,7 @@ export default function QuestionCard({
   question,
   isCompleted: initialCompleted,
   initialNotes,
+  onToggleComplete,
 }: QuestionCardProps) {
   const [isCompleted, setIsCompleted] = useState(initialCompleted);
   const [notes, setNotes] = useState(initialNotes);
@@ -41,6 +43,11 @@ export default function QuestionCard({
 
   const { isSignedIn } = useUser();
   const clerk = useClerk();
+
+  // Sync with parent props if they change (e.g. after server revalidation)
+  useEffect(() => {
+    setIsCompleted(initialCompleted);
+  }, [initialCompleted]);
 
   useEffect(() => {
     latestNotesRef.current = notes;
@@ -62,6 +69,9 @@ export default function QuestionCard({
     }
 
     setIsCompleted(checked);
+    if (onToggleComplete) {
+      onToggleComplete(checked);
+    }
     saveProgress(checked, latestNotesRef.current);
   };
 

@@ -80,8 +80,15 @@ export async function togglePinUserSheet(id: string, isPinned: boolean) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
+  // Verify ownership before update
+  const sheet = await prisma.userSheet.findFirst({
+    where: { id, userId }
+  })
+  
+  if (!sheet) throw new Error('Unauthorized or sheet not found')
+
   await prisma.userSheet.update({
-    where: { id, userId: userId },
+    where: { id },
     data: { isPinned }
   })
   revalidatePath('/')
@@ -91,8 +98,15 @@ export async function renameUserSheet(id: string, name: string) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
+  // Verify ownership before update
+  const sheet = await prisma.userSheet.findFirst({
+    where: { id, userId }
+  })
+  
+  if (!sheet) throw new Error('Unauthorized or sheet not found')
+
   await prisma.userSheet.update({
-    where: { id, userId: userId },
+    where: { id },
     data: { name }
   })
   revalidatePath('/')
@@ -102,10 +116,13 @@ export async function deleteUserSheet(id: string) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
   
-  const sheet = await prisma.userSheet.findUnique({ where: { id, userId: userId } })
+  const sheet = await prisma.userSheet.findFirst({ 
+    where: { id, userId } 
+  })
+  
   if (sheet) {
     await prisma.question.deleteMany({ where: { sheetSlug: sheet.slug } })
-    await prisma.userSheet.delete({ where: { id, userId: userId } })
+    await prisma.userSheet.delete({ where: { id } })
   }
   revalidatePath('/')
 }

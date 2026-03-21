@@ -66,6 +66,8 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
   const [renameOpen, setRenameOpen] = useState(false);
   const [sheetToRename, setSheetToRename] = useState<any>(null);
   const [newName, setNewName] = useState("");
+  const [isPending, startTransition] = React.useTransition();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleDeleteSheet = async (id: string, href: string) => {
     if (pathname === href) {
@@ -84,35 +86,37 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
       router.push(nextPath);
     }
     
-    await deleteUserSheet(id);
+    startTransition(async () => {
+      await deleteUserSheet(id);
+    });
   };
   const popularLists = [
     {
       label: "Dashboard",
       href: "/",
       icon: (
-        <LayoutDashboard className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+        <LayoutDashboard className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
       ),
     },
     {
       label: "Striver A2Z",
       href: "/sheet/striver-a2z",
       icon: (
-        <BookOpen className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+        <BookOpen className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
       ),
     },
     {
       label: "NeetCode 150",
       href: "/sheet/neetcode-150",
       icon: (
-        <BrainCog className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+        <BrainCog className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
       ),
     },
     {
       label: "Blind 75",
       href: "/sheet/blind-75",
       icon: (
-        <FolderHeart className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+        <FolderHeart className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
       ),
     },
   ];
@@ -122,9 +126,9 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
     label: sheet.name,
     href: `/sheet/${sheet.slug}`,
     icon: sheet.isPinned ? (
-      <Pin className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+      <Pin className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
     ) : (
-      <FileText className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] flex-shrink-0" />
+      <FileText className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
     ),
     isPinned: sheet.isPinned,
   }));
@@ -140,7 +144,9 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
         <SidebarBody 
           className="justify-between gap-10"
           onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
+          onMouseLeave={() => {
+            if (!isMenuOpen) setOpen(false);
+          }}
         >
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             <div className="h-12 relative flex items-center">
@@ -246,29 +252,39 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                       </div>
                       {open && (
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/custom:opacity-100 transition-opacity">
-                          <DropdownMenu>
+                          <DropdownMenu onOpenChange={setIsMenuOpen}>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-6 w-6 p-0 hover:bg-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200">
+                              <Button 
+                                variant="ghost" 
+                                className="h-6 w-6 p-0 hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-36">
-                              <DropdownMenuItem className="cursor-pointer font-medium" onClick={() => togglePinUserSheet(link.id, !link.isPinned)}>
-                                <Pin className="mr-2 h-4 w-4" /> {link.isPinned ? "Unpin Sheet" : "Pin Sheet"}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="cursor-pointer font-medium" onClick={() => {
-                                setSheetToRename(link);
-                                setNewName(link.label);
-                                setRenameOpen(true);
-                                setOpen(false);
-                              }}>
-                                <Pencil className="mr-2 h-4 w-4" /> Rename
+                            <DropdownMenuContent align="end" className="w-44 p-1.5 shadow-xl bg-white dark:bg-neutral-900 border-neutral-200/50 dark:border-white/10 overflow-hidden">
+                              <DropdownMenuItem 
+                                className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium transition-colors focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]" 
+                                onClick={() => startTransition(() => togglePinUserSheet(link.id, !link.isPinned))}
+                              >
+                                <Pin className="h-4 w-4 shrink-0" /> {link.isPinned ? "Unpin Sheet" : "Pin Sheet"}
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                className="cursor-pointer font-medium text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                                className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium transition-colors focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]" 
+                                onClick={() => {
+                                  setSheetToRename(link);
+                                  setNewName(link.label);
+                                  setRenameOpen(true);
+                                  setOpen(false);
+                                }}
+                              >
+                                <Pencil className="h-4 w-4 shrink-0" /> Rename
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 focus:bg-red-50 dark:focus:bg-red-950/30 transition-colors"
                                 onClick={() => handleDeleteSheet(link.id, link.href)}
                               >
-                                <Trash className="mr-2 h-4 w-4" /> Delete
+                                <Trash className="h-4 w-4 shrink-0" /> Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -300,24 +316,35 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
     <CreateSheetDialog open={createOpen} onOpenChange={setCreateOpen} />
 
     <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
-      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-serif">Rename Sheet</DialogTitle>
+      <DialogContent className="sm:max-w-[400px] bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-2xl shadow-2xl p-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-2">
+          <DialogTitle className="text-xl font-bold text-neutral-900 dark:text-white">Rename Sheet</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
+        <div className="px-6 py-4">
           <Input 
             value={newName} 
             onChange={(e) => setNewName(e.target.value)} 
             placeholder="Sheet name..." 
             autoFocus
+            className="h-12 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus:ring-[#88AB8E]/50 focus:border-[#88AB8E] rounded-xl text-[15px] font-medium transition-all"
           />
         </div>
-        <DialogFooter>
+        <DialogFooter className="px-6 py-4 bg-neutral-50 dark:bg-black/20 border-t border-neutral-100 dark:border-white/5 flex gap-2">
           <Button variant="outline" onClick={() => setRenameOpen(false)}>Cancel</Button>
-          <Button className="bg-[#88AB8E] hover:bg-[#6E8E75] text-white" onClick={() => {
-            if (newName.trim()) renameUserSheet(sheetToRename.id, newName.trim());
-            setRenameOpen(false);
-          }}>Save</Button>
+          <Button 
+            className="bg-[#88AB8E] hover:bg-[#6E8E75] text-white" 
+            disabled={isPending}
+            onClick={() => {
+              if (newName.trim()) {
+                startTransition(() => {
+                  renameUserSheet(sheetToRename.id, newName.trim());
+                });
+              }
+              setRenameOpen(false);
+            }}
+          >
+            {isPending ? "Saving..." : "Save"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
