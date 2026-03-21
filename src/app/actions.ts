@@ -36,3 +36,34 @@ export async function updateProgress(
   revalidatePath('/')
   revalidatePath('/sheet/[sheetSlug]', 'page')
 }
+
+export async function syncSheetProgress(questionIds: string[]) {
+  const { userId } = await auth()
+  if (!userId) {
+    throw new Error('Unauthorized')
+  }
+
+  const updates = questionIds.map((id) =>
+    prisma.userProgress.upsert({
+      where: {
+        userId_questionId: {
+          userId,
+          questionId: id,
+        },
+      },
+      update: {
+        isCompleted: true,
+      },
+      create: {
+        userId,
+        questionId: id,
+        isCompleted: true,
+      },
+    })
+  )
+
+  await prisma.$transaction(updates)
+
+  revalidatePath('/')
+  revalidatePath('/sheet/[sheetSlug]', 'page')
+}

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
-import QuestionCard from "@/components/QuestionCard";
+import SheetFilterAndList from "@/components/SheetFilterAndList";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 
@@ -57,64 +57,41 @@ export default async function SheetPage({
 
   let questions: QuestionWithProgress[] = [];
   let dbError = false;
+  let globalSolvedUrls = new Set<string>();
 
   try {
     questions = await fetchQuestionsWithProgress(userId, sheet);
+    
+    if (userId) {
+      const globalSolvedProgress = await prisma.userProgress.findMany({
+        where: { userId, isCompleted: true },
+        select: { question: { select: { url: true } } },
+      });
+      globalSolvedProgress.forEach((p) => {
+        if (p.question) globalSolvedUrls.add(p.question.url);
+      });
+    }
   } catch (error) {
     console.error("Database connection error in SheetPage:", error);
     dbError = true;
   }
 
-  const solvedCount = questions.filter(
-    (q) => q.progress[0]?.isCompleted === true,
+  const enhancedQuestions = questions.map((q) => ({
+    ...q,
+    isSolvedGlobally: globalSolvedUrls.has(q.url),
+    isCompletedLocally: q.progress[0]?.isCompleted === true,
+  }));
+
+  const solvedCount = enhancedQuestions.filter(
+    (q) => q.isCompletedLocally || q.isSolvedGlobally,
   ).length;
-  const totalCount = questions.length;
+  const totalCount = enhancedQuestions.length;
   const progressPercent = totalCount > 0 ? (solvedCount / totalCount) * 100 : 0;
-
-  // Group questions by primary topic for topic-first display
-  const topicGroups = questions.reduce(
-    (acc, q) => {
-      const topic = q.topics?.[0] || "Uncategorized";
-      if (!acc[topic]) {
-        acc[topic] = [];
-      }
-      acc[topic].push(q);
-      return acc;
-    },
-    {} as Record<string, QuestionWithProgress[]>,
-  );
-
-  const sortedTopicEntries = Object.entries(topicGroups).sort(([a], [b]) =>
-    a.localeCompare(b),
-  );
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full">
-      <div className="mb-6">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-          {sheetName}
-        </h1>
-        {!dbError && totalCount > 0 && (
-          <div className="flex items-center gap-4">
-            <div className="w-full h-2 rounded-full bg-gray-100 dark:bg-gray-800/70 overflow-hidden">
-              <div
-                className="h-full bg-green-400 dark:bg-green-500 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <div className="text-sm font-semibold whitespace-nowrap text-gray-700 dark:text-gray-200">
-              <span className="text-green-600 dark:text-green-400">
-                {solvedCount}
-              </span>
-              <span className="mx-1">/</span>
-              <span>{totalCount}</span>
-              <span className="ml-1">solved</span>
-            </div>
-          </div>
-        )}
-      </div>
 
-      {!userId && questions.length > 0 && (
+      {!userId && enhancedQuestions.length > 0 && (
         <div className="bg-[#88AB8E]/5 dark:bg-[#88AB8E]/10 backdrop-blur-sm border border-[#88AB8E]/20 dark:border-[#88AB8E]/30 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <p className="font-semibold text-[#4A644F] dark:text-[#E2EBE4]">
@@ -147,65 +124,15 @@ export default async function SheetPage({
         </div>
       )}
 
-      {!dbError && questions.length === 0 && (
+      {!dbError && enhancedQuestions.length === 0 && (
         <div className="text-gray-500 italic">
           No questions found for this sheet. Make sure to seed the database for{" "}
           <code>{sheet}</code>.
         </div>
       )}
 
-      {!dbError && questions.length > 0 && (
-        <div className="space-y-4 mt-2">
-          {sortedTopicEntries.map(([topic, topicQuestions]) => {
-            const topicSolved = topicQuestions.filter(
-              (q) => q.progress[0]?.isCompleted === true,
-            ).length;
-            const topicTotal = topicQuestions.length;
-            const topicProgress =
-              topicTotal > 0 ? (topicSolved / topicTotal) * 100 : 0;
-
-            return (
-              <details
-                key={topic}
-                className="group rounded-2xl border border-gray-200 dark:border-white/10 bg-[#e9efea] dark:bg-[#272627]/50 p-4"
-              >
-                <summary className="flex items-center justify-between cursor-pointer select-none">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {topic}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-300">
-                      {topicSolved} / {topicTotal} solved
-                    </p>
-                  </div>
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-200">
-                    {topicSolved}/{topicTotal}
-                  </span>
-                </summary>
-
-                <div className="mt-4 space-y-4">
-                  {topicQuestions.map((q) => {
-                    const progress = q.progress[0];
-                    return (
-                      <QuestionCard
-                        key={q.id}
-                        question={{
-                          id: q.id,
-                          title: q.title,
-                          url: q.url,
-                          difficulty: q.difficulty,
-                          topics: q.topics,
-                        }}
-                        isCompleted={progress?.isCompleted || false}
-                        initialNotes={progress?.notes || ""}
-                      />
-                    );
-                  })}
-                </div>
-              </details>
-            );
-          })}
-        </div>
+      {!dbError && enhancedQuestions.length > 0 && (
+        <SheetFilterAndList questions={enhancedQuestions} userId={userId} sheetName={sheetName} />
       )}
     </div>
   );
