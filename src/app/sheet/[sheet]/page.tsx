@@ -61,6 +61,23 @@ export default async function SheetPage({
   const totalCount = questions.length;
   const progressPercent = totalCount > 0 ? (solvedCount / totalCount) * 100 : 0;
 
+  // Group questions by primary topic for topic-first display
+  const topicGroups = questions.reduce(
+    (acc, q) => {
+      const topic = q.topics?.[0] || "Uncategorized";
+      if (!acc[topic]) {
+        acc[topic] = [];
+      }
+      acc[topic].push(q);
+      return acc;
+    },
+    {} as Record<string, QuestionWithProgress[]>,
+  );
+
+  const sortedTopicEntries = Object.entries(topicGroups).sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
+
   return (
     <div className="p-8 max-w-4xl mx-auto w-full">
       <div className="mb-6">
@@ -128,22 +145,54 @@ export default async function SheetPage({
       )}
 
       {!dbError && questions.length > 0 && (
-        <div className="grid gap-4 mt-2">
-          {questions.map((q) => {
-            const progress = q.progress[0];
+        <div className="space-y-4 mt-2">
+          {sortedTopicEntries.map(([topic, topicQuestions]) => {
+            const topicSolved = topicQuestions.filter(
+              (q) => q.progress[0]?.isCompleted === true,
+            ).length;
+            const topicTotal = topicQuestions.length;
+            const topicProgress =
+              topicTotal > 0 ? (topicSolved / topicTotal) * 100 : 0;
+
             return (
-              <QuestionCard
-                key={q.id}
-                question={{
-                  id: q.id,
-                  title: q.title,
-                  url: q.url,
-                  difficulty: q.difficulty,
-                  topics: q.topics,
-                }}
-                isCompleted={progress?.isCompleted || false}
-                initialNotes={progress?.notes || ""}
-              />
+              <details
+                key={topic}
+                className="group rounded-2xl border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-[#272627]/50 p-4"
+              >
+                <summary className="flex items-center justify-between cursor-pointer select-none">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {topic}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">
+                      {topicSolved} / {topicTotal} solved
+                    </p>
+                  </div>
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-200">
+                    {topicSolved}/{topicTotal}
+                  </span>
+                </summary>
+
+                <div className="mt-4 space-y-4">
+                  {topicQuestions.map((q) => {
+                    const progress = q.progress[0];
+                    return (
+                      <QuestionCard
+                        key={q.id}
+                        question={{
+                          id: q.id,
+                          title: q.title,
+                          url: q.url,
+                          difficulty: q.difficulty,
+                          topics: q.topics,
+                        }}
+                        isCompleted={progress?.isCompleted || false}
+                        initialNotes={progress?.notes || ""}
+                      />
+                    );
+                  })}
+                </div>
+              </details>
             );
           })}
         </div>

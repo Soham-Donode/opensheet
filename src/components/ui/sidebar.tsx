@@ -19,7 +19,7 @@ interface SidebarContextProps {
 }
 
 const SidebarContext = createContext<SidebarContextProps | undefined>(
-  undefined
+  undefined,
 );
 
 export const useSidebar = () => {
@@ -89,16 +89,16 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 flex-shrink-0",
+        "h-full py-4 hidden md:flex md:flex-col bg-[#e9efea]/50 dark:bg-neutral-800 flex-shrink-0",
         open ? "px-3" : "px-[7.5px]",
-        className
+        className,
       )}
       animate={{
         width: animate ? (open ? "250px" : "60px") : "250px",
       }}
       transition={{
         duration: 0.3,
-        ease: "easeInOut"
+        ease: "easeInOut",
       }}
       {...props}
     >
@@ -117,7 +117,7 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full",
         )}
         {...props}
       >
@@ -139,7 +139,7 @@ export const MobileSidebar = ({
               }}
               className={cn(
                 "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
-                className
+                className,
               )}
             >
               <div
@@ -174,18 +174,22 @@ export const SidebarLink = ({
       href={link.href}
       className={cn(
         "flex items-center group/sidebar rounded-full transition-all duration-300",
-        active 
-          ? "bg-white/60 dark:bg-white/10 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-white/40 dark:border-white/5 text-neutral-900 dark:text-neutral-100" 
+        active
+          ? "bg-white/60 dark:bg-white/10 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-white/40 dark:border-white/5 text-neutral-900 dark:text-neutral-100"
           : "hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 text-[#666666] dark:text-neutral-400",
-        open ? "py-2 px-3 min-h-[44px] justify-start gap-3" : "h-11 w-11 justify-center gap-0",
-        className
+        open
+          ? "py-2 px-3 min-h-[44px] justify-start gap-3"
+          : "h-11 w-11 justify-center gap-0",
+        className,
       )}
       {...props}
     >
-      <div className={cn(
-        "shrink-0 transition-transform duration-300",
-        active && "scale-105"
-      )}>
+      <div
+        className={cn(
+          "shrink-0 transition-transform duration-300",
+          active && "scale-105",
+        )}
+      >
         {link.icon}
       </div>
       <AnimatePresence mode="wait">
@@ -196,7 +200,9 @@ export const SidebarLink = ({
             exit={{ opacity: 0, x: -5, transition: { duration: 0.1 } }}
             className={cn(
               "text-[14px] font-medium transition duration-150 whitespace-pre inline-block !p-0 !m-0",
-              active ? "text-neutral-900 dark:text-neutral-100" : "text-inherit"
+              active
+                ? "text-neutral-900 dark:text-neutral-100"
+                : "text-inherit",
             )}
           >
             {link.label}
