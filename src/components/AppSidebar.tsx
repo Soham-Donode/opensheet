@@ -121,7 +121,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
     <>
     <div
       className={cn(
-        "flex flex-col md:flex-row dark:bg-[#030303] w-full flex-1 overflow-x-hidden md:overflow-hidden h-auto md:h-screen",
+        "flex flex-col md:flex-row bg-[#e9efea] dark:bg-neutral-900 w-full flex-1 overflow-x-hidden md:overflow-hidden h-auto md:h-screen",
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
@@ -145,11 +145,12 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                 </AnimatePresence>
                 <div className="flex flex-col gap-1">
                   {popularLists.map((link, idx) => (
-                    <SidebarLink
-                      key={idx}
-                      link={link}
-                      active={pathname === link.href}
-                    />
+                    <div key={idx} onClick={() => setOpen(false)}>
+                      <SidebarLink
+                        link={link}
+                        active={pathname === link.href}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -172,7 +173,10 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                   <AnimatePresence mode="wait">
                     {open && (
                       <motion.button
-                        onClick={() => setCreateOpen(true)}
+                        onClick={() => {
+                          setCreateOpen(true);
+                          setOpen(false);
+                        }}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
@@ -186,11 +190,13 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                 <div className="flex flex-col gap-1">
                   {customLists.map((link) => (
                     <div key={link.id} className="relative group/custom">
-                      <SidebarLink
-                        link={link}
-                        active={pathname === link.href}
-                        className={open ? "pr-8" : ""}
-                      />
+                      <div onClick={() => setOpen(false)}>
+                        <SidebarLink
+                          link={link}
+                          active={pathname === link.href}
+                          className={open ? "pr-8" : ""}
+                        />
+                      </div>
                       {open && (
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/custom:opacity-100 transition-opacity">
                           <DropdownMenu>
@@ -207,6 +213,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                                 setSheetToRename(link);
                                 setNewName(link.label);
                                 setRenameOpen(true);
+                                setOpen(false);
                               }}>
                                 <Pencil className="mr-2 h-4 w-4" /> Rename
                               </DropdownMenuItem>

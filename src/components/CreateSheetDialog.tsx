@@ -113,12 +113,12 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] font-sans bg-[#e9efea] dark:bg-neutral-900 border-neutral-200/50 dark:border-white/5 rounded-[2rem] shadow-2xl backdrop-blur-3xl overflow-hidden p-0 [&>button]:hidden flex flex-col m-0">
+      <DialogContent className="w-[95vw] sm:max-w-[550px] max-h-[90vh] font-sans bg-[#e9efea] dark:bg-neutral-900 border-neutral-200/50 dark:border-white/5 rounded-[2rem] shadow-2xl backdrop-blur-3xl overflow-hidden p-0 [&>button]:hidden flex flex-col m-0">
         
         {/* Soft Decorative Gradient Background */}
         <div className="absolute inset-0 bg-linear-to-br from-[#88AB8E]/20 via-transparent to-[#AFC8AD]/10 pointer-events-none z-0" />
 
-        <div className="w-full h-full relative z-10 flex flex-col">
+        <div className="w-full h-full relative z-10 flex flex-col overflow-y-auto overflow-x-hidden custom-scrollbar">
           {/* Custom Close Button - Absolute for stability */}
           <button 
             onClick={() => onOpenChange(false)} 
@@ -317,7 +317,7 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
                     <div key={i} className="text-sm flex items-start gap-3 p-3 hover:bg-white dark:hover:bg-white/5 rounded-xl transition-colors group relative pr-10">
                       <span className="text-neutral-400 font-bold min-w-[20px] pt-0.5 text-xs">{i + 1}.</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-[#88AB8E] transition-colors leading-snug whitespace-normal break-words">{q.title}</p>
+                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-[#88AB8E] transition-colors leading-snug whitespace-normal wrap-break-word">{q.title}</p>
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                           <span className={cn(
                             "text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-md font-bold",
