@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Sidebar,
   SidebarBody,
@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -51,6 +51,18 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
   
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("create") === "true") {
+      setCreateOpen(true);
+      // Clean up the URL
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.delete("create");
+      window.history.replaceState(null, "", currentUrl.toString());
+    }
+  }, [searchParams]);
+
   const [renameOpen, setRenameOpen] = useState(false);
   const [sheetToRename, setSheetToRename] = useState<any>(null);
   const [newName, setNewName] = useState("");
@@ -125,24 +137,57 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
+        <SidebarBody 
+          className="justify-between gap-10"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            {open ? <Logo /> : <LogoIcon />}
+            <div className="h-12 relative flex items-center">
+              <AnimatePresence mode="wait">
+                {open ? (
+                  <motion.div
+                    key="logo-full"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-full"
+                  >
+                    <Logo />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="logo-icon"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-full"
+                  >
+                    <LogoIcon />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <div className="mt-8 flex flex-col gap-4">
               {/* Popular Lists Section */}
               <div className="flex flex-col gap-2">
-                <AnimatePresence mode="wait">
-                  {open && (
-                    <motion.p
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 px-3 mb-1"
-                    >
-                      Popular Sheets
-                    </motion.p>
-                  )}
-                </AnimatePresence>
+                <div className="h-6 flex items-center mb-1">
+                  <AnimatePresence mode="wait">
+                    {open && (
+                      <motion.p
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 px-3 whitespace-nowrap"
+                      >
+                        Popular Sheets
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </div>
                 <div className="flex flex-col gap-1">
                   {popularLists.map((link, idx) => (
                     <div key={idx} onClick={() => setOpen(false)}>
@@ -157,14 +202,15 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
 
               {/* Your Lists Section */}
               <div className="flex flex-col gap-2 pt-2">
-                <div className="flex items-center justify-between px-3 mb-1 group/header">
+                <div className="h-6 flex items-center justify-between px-3 mb-1 group/header relative">
                   <AnimatePresence mode="wait">
                     {open && (
                       <motion.p
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
-                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500"
+                        transition={{ duration: 0.2 }}
+                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 whitespace-nowrap"
                       >
                         Your Sheets
                       </motion.p>
@@ -180,11 +226,12 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
                         className="p-1 rounded-md hover:bg-neutral-200/50 dark:hover:bg-white/5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
                       >
                         <Plus className="h-3.5 w-3.5" />
                       </motion.button>
-                    )}
+                     )}
                   </AnimatePresence>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -267,7 +314,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setRenameOpen(false)}>Cancel</Button>
-          <Button className="bg-[#4361EE] hover:bg-[#324BCC] text-white" onClick={() => {
+          <Button className="bg-[#88AB8E] hover:bg-[#6E8E75] text-white" onClick={() => {
             if (newName.trim()) renameUserSheet(sheetToRename.id, newName.trim());
             setRenameOpen(false);
           }}>Save</Button>

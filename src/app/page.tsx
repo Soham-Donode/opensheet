@@ -13,6 +13,7 @@ import {
   Heart,
   Mailbox,
   Star,
+  Sparkles,
 } from "lucide-react";
 
 const Squiggle = ({ className }: { className?: string }) => (
@@ -161,32 +162,40 @@ export default async function Home() {
             regain the momentum of your interview prep.
           </p>
 
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             {userId ? (
-              <Button
-                asChild
-                className="rounded-full px-10 py-7 text-lg font-medium bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none"
-              >
-                <Link href="/sheet/striver-a2z">
-                  Go to Dashboard <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
+              <>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-full px-8 py-7 text-lg font-bold border-neutral-300 dark:border-white/10 hover:bg-[#88AB8E]/5 hover:text-[#4A644F] transition-all shadow-sm"
+                >
+                  <Link href="#popular-sheets">
+                    Explore Popular Sheets
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  className="rounded-full px-8 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none"
+                >
+                  <Link href="/sheet/striver-a2z?create=true">
+                    Custom Sheets <Sparkles className="ml-2 w-5 h-5 fill-white/20 text-white" />
+                  </Link>
+                </Button>
+              </>
             ) : (
               <SignInButton mode="modal">
-                <Button className="rounded-full px-10 py-7 text-lg font-medium bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none">
-                  Start Tracking <ArrowRight className="ml-2 w-5 h-5" />
+                <Button className="rounded-full px-10 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none">
+                  Get Started <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </SignInButton>
             )}
-            <span className="text-sm font-medium italic text-neutral-500 mt-2">
-              It's free!
-            </span>
           </div>
         </div>
       </section>
 
       {/* Sheets Grid Section */}
-      <section className="w-full max-w-5xl mx-auto px-6 pb-24 z-10 relative">
+      <section id="popular-sheets" className="w-full max-w-5xl mx-auto px-6 pb-24 z-10 relative scroll-mt-20">
         <div className="text-center mb-12">
           <p className="text-sm font-medium tracking-widest uppercase text-neutral-400 mb-3">
             Get Started

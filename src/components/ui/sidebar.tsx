@@ -89,7 +89,7 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full py-4 hidden md:flex md:flex-col bg-[#e9efea]/50 dark:bg-neutral-800 flex-shrink-0",
+        "h-full py-4 hidden md:flex md:flex-col bg-[#e9efea]/50 dark:bg-neutral-800 flex-shrink-0 overflow-hidden",
         open ? "px-3" : "px-[7.5px]",
         className,
       )}
@@ -138,7 +138,7 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-[#e9efea]/50 backdrop-blur-xl dark:bg-neutral-900/90 p-10 z-[100] flex flex-col justify-between",
+                "fixed h-full w-full inset-0 bg-[#e9efea]/50 backdrop-blur-xl dark:bg-neutral-900/90 p-10 z-[100] flex flex-col justify-between overflow-hidden",
                 className,
               )}
             >
@@ -171,9 +171,7 @@ export const SidebarLink = ({
         active
           ? "bg-white/60 dark:bg-white/10 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-white/40 dark:border-white/5 text-neutral-900 dark:text-neutral-100"
           : "hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 text-[#666666] dark:text-neutral-400",
-        open
-          ? "py-2 px-3 min-h-[44px] justify-start gap-3"
-          : "h-11 w-11 justify-center gap-0",
+        "py-2 px-3 min-h-[44px] justify-start gap-3",
         className,
       )}
       {...props}
