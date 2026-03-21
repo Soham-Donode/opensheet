@@ -143,8 +143,11 @@ export default async function Home() {
           <Star className="absolute bottom-[10%] right-[12%] text-amber-400 w-7 h-7 rotate-45 stroke-[2.5]" />
         </div>
 
+        {/* Full-Background Glassmorphic Layer */}
+        <div className="absolute inset-0 bg-white/5 dark:bg-white/1 backdrop-blur-[1px] z-5 pointer-events-none" />
+
         {/* Hero Content */}
-        <div className="relative z-10 flex flex-col items-center px-6 max-w-4xl text-center pb-8 mt-12">
+        <div className="relative z-10 flex flex-col items-center px-8 md:px-12 py-10 max-w-4xl text-center">
           <h2 className="text-sm font-extrabold tracking-[0.2em] uppercase mb-10 text-neutral-900 dark:text-neutral-200">
             OPENSHEET
           </h2>

@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   PanelLeft,
   LogIn,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,7 +27,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const links = [
+  const popularLists = [
     {
       label: "Dashboard",
       href: "/",
@@ -57,6 +58,8 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     },
   ];
 
+  const customLists: any[] = [];
+
   return (
     <div
       className={cn(
@@ -67,14 +70,75 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-10 flex flex-col gap-2 ">
-              {links.map((link, idx) => (
-                <SidebarLink
-                  key={idx}
-                  link={link}
-                  active={pathname === link.href}
-                />
-              ))}
+            <div className="mt-8 flex flex-col gap-4">
+              {/* Popular Lists Section */}
+              <div className="flex flex-col gap-2">
+                <AnimatePresence mode="wait">
+                  {open && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 px-3 mb-1"
+                    >
+                      Popular Sheets
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+                <div className="flex flex-col gap-1">
+                  {popularLists.map((link, idx) => (
+                    <SidebarLink
+                      key={idx}
+                      link={link}
+                      active={pathname === link.href}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Your Lists Section */}
+              <div className="flex flex-col gap-2 pt-2">
+                <div className="flex items-center justify-between px-3 mb-1 group/header">
+                  <AnimatePresence mode="wait">
+                    {open && (
+                      <motion.p
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500"
+                      >
+                        Your Sheets
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                  <AnimatePresence mode="wait">
+                    {open && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="p-1 rounded-md hover:bg-neutral-200/50 dark:hover:bg-white/5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </div>
+                <div className="flex flex-col gap-1">
+                  {customLists.map((link, idx) => (
+                    <SidebarLink
+                      key={idx}
+                      link={link}
+                      active={pathname === link.href}
+                    />
+                  ))}
+                  {open && customLists.length === 0 && (
+                    <p className="px-3 text-[11px] text-neutral-400/60 dark:text-neutral-500/50 italic py-1">
+                      No custom lists yet
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2 pt-4 border-t border-neutral-200/50 dark:border-white/10">
