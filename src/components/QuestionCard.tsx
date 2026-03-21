@@ -6,6 +6,7 @@ import { useClerk, useUser } from "@clerk/nextjs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SaveQuestionDialog } from "./SaveQuestionDialog";
 
 interface QuestionCardProps {
   question: {
@@ -132,6 +133,8 @@ export default function QuestionCard({
         >
           {question.difficulty}
         </span>
+
+        <SaveQuestionDialog question={question} />
 
         {/* Notes Icon Button */}
         <button

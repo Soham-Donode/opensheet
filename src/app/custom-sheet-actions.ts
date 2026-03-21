@@ -109,3 +109,92 @@ export async function deleteUserSheet(id: string) {
   }
   revalidatePath('/')
 }
+
+export async function getUserSheetsWithPresence(questionUrl: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  const sheets = await prisma.userSheet.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  const sheetsWithPresence = await Promise.all(
+    sheets.map(async (sheet) => {
+      const existingQuestion = await prisma.question.findFirst({
+        where: {
+          sheetSlug: sheet.slug,
+          url: questionUrl
+        }
+      });
+      return {
+        id: sheet.id,
+        name: sheet.name,
+        slug: sheet.slug,
+        containsQuestion: !!existingQuestion
+      };
+    })
+  );
+
+  return sheetsWithPresence;
+}
+
+export async function toggleQuestionInSheet(
+  sheetSlug: string,
+  questionData: { title: string; url: string; difficulty: string; topics: string[] },
+  add: boolean
+) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  // Verify ownership
+  const sheet = await prisma.userSheet.findUnique({
+    where: { slug: sheetSlug, userId }
+  });
+  if (!sheet) throw new Error('Sheet not found');
+
+  if (add) {
+    // Check if it already exists to prevent duplicates
+    const exists = await prisma.question.findFirst({
+      where: { sheetSlug, url: questionData.url }
+    });
+    if (!exists) {
+      await prisma.question.create({
+        data: {
+          title: questionData.title,
+          url: questionData.url,
+          difficulty: questionData.difficulty,
+          topics: questionData.topics,
+          sheetSlug
+        }
+      });
+    }
+  } else {
+    // Remove all instances of this question from this sheet
+    await prisma.question.deleteMany({
+      where: { sheetSlug, url: questionData.url }
+    });
+  }
+
+  revalidatePath('/');
+  revalidatePath(`/sheet/${sheetSlug}`);
+  return { success: true };
+}
+
+export async function createEmptySheet(name: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  const slug = `custom-${userId}-${Date.now()}`;
+  await prisma.userSheet.create({
+    data: {
+      userId,
+      name,
+      slug,
+      isPinned: false
+    }
+  });
+
+  revalidatePath('/');
+  return { success: true, slug };
+}
