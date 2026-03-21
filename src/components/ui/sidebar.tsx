@@ -117,7 +117,7 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full",
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-[#e9efea]/50 dark:bg-neutral-800 w-full",
         )}
         {...props}
       >
@@ -138,16 +138,10 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
+                "fixed h-full w-full inset-0 bg-[#e9efea]/50 backdrop-blur-xl dark:bg-neutral-900/90 p-10 z-[100] flex flex-col justify-between",
                 className,
               )}
             >
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
-                onClick={() => setOpen(!open)}
-              >
-                <X />
-              </div>
               {children}
             </motion.div>
           )}

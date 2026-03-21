@@ -51,7 +51,7 @@ export default async function RootLayout({
             }}
           />
         </head>
-        <body className="h-screen flex flex-col m-0 p-0 overflow-hidden">
+        <body className="h-full md:h-screen flex flex-col m-0 p-0 overflow-x-hidden md:overflow-hidden">
           <ThemeProvider>
             <AppSidebar>
               <main className="flex-1 overflow-y-auto bg-dot-matrix">
