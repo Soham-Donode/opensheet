@@ -10,7 +10,7 @@ export const metadata = {
 
 export default async function DashboardPage() {
   const { userId } = await auth();
-  
+
   if (!userId) {
     redirect("/");
   }
@@ -20,5 +20,19 @@ export default async function DashboardPage() {
     orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
   });
 
-  return <DashboardClient customSheets={customSheets} />;
+  // Fetch unique topics from the user's questions to suggest them in the 'Add Question' dialog
+  const userQuestions = await prisma.question.findMany({
+    where: {
+      sheetSlug: {
+        in: customSheets.map((s) => s.slug),
+      },
+    },
+    select: { topics: true },
+  });
+
+  const allTopics = Array.from(
+    new Set(userQuestions.flatMap((q) => q.topics)),
+  ).sort();
+
+  return <DashboardClient customSheets={customSheets} allTopics={allTopics} />;
 }

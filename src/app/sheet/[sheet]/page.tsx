@@ -44,7 +44,7 @@ export default async function SheetPage({
   if (!sheetName) {
     const customSheet = await prisma.userSheet.findUnique({
       where: { slug: sheet },
-      select: { name: true }
+      select: { name: true },
     });
     if (customSheet) {
       sheetName = customSheet.name;
@@ -61,7 +61,7 @@ export default async function SheetPage({
 
   try {
     questions = await fetchQuestionsWithProgress(userId, sheet);
-    
+
     if (userId) {
       const globalSolvedProgress = await prisma.userProgress.findMany({
         where: { userId, isCompleted: true },
@@ -90,7 +90,6 @@ export default async function SheetPage({
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full">
-
       {!userId && enhancedQuestions.length > 0 && (
         <div className="bg-[#88AB8E]/5 dark:bg-[#88AB8E]/10 backdrop-blur-sm border border-[#88AB8E]/20 dark:border-[#88AB8E]/30 p-6 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
@@ -125,14 +124,27 @@ export default async function SheetPage({
       )}
 
       {!dbError && enhancedQuestions.length === 0 && (
-        <div className="text-gray-500 italic">
-          No questions found for this sheet. Make sure to seed the database for{" "}
-          <code>{sheet}</code>.
+        <div className="flex flex-col gap-6">
+          <div className="text-gray-500 italic">
+            No questions found for this sheet. Add your first question to get
+            started.
+          </div>
+          <SheetFilterAndList
+            questions={[]}
+            userId={userId}
+            sheetName={sheetName}
+            sheetSlug={sheet}
+          />
         </div>
       )}
 
       {!dbError && enhancedQuestions.length > 0 && (
-        <SheetFilterAndList questions={enhancedQuestions} userId={userId} sheetName={sheetName} />
+        <SheetFilterAndList
+          questions={enhancedQuestions}
+          userId={userId}
+          sheetName={sheetName}
+          sheetSlug={sheet}
+        />
       )}
     </div>
   );

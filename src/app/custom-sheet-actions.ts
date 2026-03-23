@@ -1,16 +1,20 @@
-'use server'
+"use server";
 
-import { auth } from '@clerk/nextjs/server'
-import prisma from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
-import { GoogleGenAI } from '@google/genai'
+import { auth } from "@clerk/nextjs/server";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+import { GoogleGenAI } from "@google/genai";
 
 // Initialize the Google Gen AI SDK
-const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY })
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
-export async function generateCustomSheet(topics: string, experienceLevel: string, maxQuestions: number) {
-  const { userId } = await auth()
-  if (!userId) throw new Error('Unauthorized')
+export async function generateCustomSheet(
+  topics: string,
+  experienceLevel: string,
+  maxQuestions: number,
+) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
 
   const prompt = `Generate a JSON array of exactly ${maxQuestions} interview questions for topics: ${topics}. Experience level: ${experienceLevel}.
   Each object in the array MUST have these exact keys:
@@ -19,32 +23,35 @@ export async function generateCustomSheet(topics: string, experienceLevel: strin
   - "difficulty": (string) "Easy", "Medium", or "Hard"
   - "topics": (array of strings) The tags/topics for the question
 
-  Return ONLY raw JSON array, without any markdown formatting or \`\`\`json blocks. Just the raw array starting with [ and ending with ].`
+  Return ONLY raw JSON array, without any markdown formatting or \`\`\`json blocks. Just the raw array starting with [ and ending with ].`;
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       contents: prompt,
-      config: { responseMimeType: 'application/json' }
-    })
+      config: { responseMimeType: "application/json" },
+    });
 
-    let text = response.text || "[]"
+    let text = response.text || "[]";
     // Clean up if it returned markdown json blocks despite instructions
-    text = text.replace(/^```(json)?/, '').replace(/```$/, '').trim()
+    text = text
+      .replace(/^```(json)?/, "")
+      .replace(/```$/, "")
+      .trim();
 
-    const parsed = JSON.parse(text)
-    return { success: true, questions: parsed }
+    const parsed = JSON.parse(text);
+    return { success: true, questions: parsed };
   } catch (error) {
-    console.error("Failed to parse Gemini response:", error)
-    return { success: false, error: "Failed to generate valid questions" }
+    console.error("Failed to parse Gemini response:", error);
+    return { success: false, error: "Failed to generate valid questions" };
   }
 }
 
 export async function saveCustomSheet(name: string, questions: any[]) {
-  const { userId } = await auth()
-  if (!userId) throw new Error('Unauthorized')
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
 
-  const slug = `custom-${userId}-${Date.now()}`
+  const slug = `custom-${userId}-${Date.now()}`;
 
   try {
     await prisma.userSheet.create({
@@ -52,88 +59,88 @@ export async function saveCustomSheet(name: string, questions: any[]) {
         userId,
         name,
         slug,
-        isPinned: false
-      }
-    })
+        isPinned: false,
+      },
+    });
 
-    const questionData = questions.map(q => ({
+    const questionData = questions.map((q) => ({
       title: q.title,
       url: q.url,
       difficulty: q.difficulty,
       topics: q.topics,
-      sheetSlug: slug
-    }))
+      sheetSlug: slug,
+    }));
 
     await prisma.question.createMany({
-      data: questionData
-    })
+      data: questionData,
+    });
 
-    revalidatePath('/')
-    return { success: true, slug }
+    revalidatePath("/");
+    return { success: true, slug };
   } catch (error: any) {
-    console.error("Error saving sheet:", error)
-    return { success: false, error: error.message }
+    console.error("Error saving sheet:", error);
+    return { success: false, error: error.message };
   }
 }
 
 export async function togglePinUserSheet(id: string, isPinned: boolean) {
-  const { userId } = await auth()
-  if (!userId) throw new Error('Unauthorized')
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
 
   // Verify ownership before update
   const sheet = await prisma.userSheet.findFirst({
-    where: { id, userId }
-  })
-  
-  if (!sheet) throw new Error('Unauthorized or sheet not found')
+    where: { id, userId },
+  });
+
+  if (!sheet) throw new Error("Unauthorized or sheet not found");
 
   await prisma.userSheet.update({
     where: { id },
-    data: { isPinned }
-  })
-  revalidatePath('/')
+    data: { isPinned },
+  });
+  revalidatePath("/");
 }
 
 export async function renameUserSheet(id: string, name: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error('Unauthorized')
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
 
   // Verify ownership before update
   const sheet = await prisma.userSheet.findFirst({
-    where: { id, userId }
-  })
-  
-  if (!sheet) throw new Error('Unauthorized or sheet not found')
+    where: { id, userId },
+  });
+
+  if (!sheet) throw new Error("Unauthorized or sheet not found");
 
   await prisma.userSheet.update({
     where: { id },
-    data: { name }
-  })
-  revalidatePath('/')
+    data: { name },
+  });
+  revalidatePath("/");
 }
 
 export async function deleteUserSheet(id: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error('Unauthorized')
-  
-  const sheet = await prisma.userSheet.findFirst({ 
-    where: { id, userId } 
-  })
-  
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const sheet = await prisma.userSheet.findFirst({
+    where: { id, userId },
+  });
+
   if (sheet) {
-    await prisma.question.deleteMany({ where: { sheetSlug: sheet.slug } })
-    await prisma.userSheet.delete({ where: { id } })
+    await prisma.question.deleteMany({ where: { sheetSlug: sheet.slug } });
+    await prisma.userSheet.delete({ where: { id } });
   }
-  revalidatePath('/')
+  revalidatePath("/");
 }
 
 export async function getUserSheetsWithPresence(questionUrl: string) {
   const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
+  if (!userId) throw new Error("Unauthorized");
 
   const sheets = await prisma.userSheet.findMany({
     where: { userId },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: "desc" },
   });
 
   const sheetsWithPresence = await Promise.all(
@@ -141,16 +148,16 @@ export async function getUserSheetsWithPresence(questionUrl: string) {
       const existingQuestion = await prisma.question.findFirst({
         where: {
           sheetSlug: sheet.slug,
-          url: questionUrl
-        }
+          url: questionUrl,
+        },
       });
       return {
         id: sheet.id,
         name: sheet.name,
         slug: sheet.slug,
-        containsQuestion: !!existingQuestion
+        containsQuestion: !!existingQuestion,
       };
-    })
+    }),
   );
 
   return sheetsWithPresence;
@@ -158,22 +165,27 @@ export async function getUserSheetsWithPresence(questionUrl: string) {
 
 export async function toggleQuestionInSheet(
   sheetSlug: string,
-  questionData: { title: string; url: string; difficulty: string; topics: string[] },
-  add: boolean
+  questionData: {
+    title: string;
+    url: string;
+    difficulty: string;
+    topics: string[];
+  },
+  add: boolean,
 ) {
   const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
+  if (!userId) throw new Error("Unauthorized");
 
   // Verify ownership
   const sheet = await prisma.userSheet.findUnique({
-    where: { slug: sheetSlug, userId }
+    where: { slug: sheetSlug, userId },
   });
-  if (!sheet) throw new Error('Sheet not found');
+  if (!sheet) throw new Error("Sheet not found");
 
   if (add) {
     // Check if it already exists to prevent duplicates
     const exists = await prisma.question.findFirst({
-      where: { sheetSlug, url: questionData.url }
+      where: { sheetSlug, url: questionData.url },
     });
     if (!exists) {
       await prisma.question.create({
@@ -182,25 +194,25 @@ export async function toggleQuestionInSheet(
           url: questionData.url,
           difficulty: questionData.difficulty,
           topics: questionData.topics,
-          sheetSlug
-        }
+          sheetSlug,
+        },
       });
     }
   } else {
     // Remove all instances of this question from this sheet
     await prisma.question.deleteMany({
-      where: { sheetSlug, url: questionData.url }
+      where: { sheetSlug, url: questionData.url },
     });
   }
 
-  revalidatePath('/');
+  revalidatePath("/");
   revalidatePath(`/sheet/${sheetSlug}`);
   return { success: true };
 }
 
 export async function createEmptySheet(name: string) {
   const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
+  if (!userId) throw new Error("Unauthorized");
 
   const slug = `custom-${userId}-${Date.now()}`;
   await prisma.userSheet.create({
@@ -208,17 +220,17 @@ export async function createEmptySheet(name: string) {
       userId,
       name,
       slug,
-      isPinned: false
-    }
+      isPinned: false,
+    },
   });
 
-  revalidatePath('/');
+  revalidatePath("/");
   return { success: true, slug };
 }
 
 export async function mergeSheets(name: string, selectedSheetSlugs: string[]) {
   const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
+  if (!userId) throw new Error("Unauthorized");
 
   const slug = `custom-${userId}-${Date.now()}`;
 
@@ -227,9 +239,9 @@ export async function mergeSheets(name: string, selectedSheetSlugs: string[]) {
     const questionsToMerge = await prisma.question.findMany({
       where: {
         sheetSlug: {
-          in: selectedSheetSlugs
-        }
-      }
+          in: selectedSheetSlugs,
+        },
+      },
     });
 
     // 2. Filter unique questions by URL to avoid duplicates
@@ -242,7 +254,10 @@ export async function mergeSheets(name: string, selectedSheetSlugs: string[]) {
     const uniqueQuestions = Array.from(uniqueQuestionsMap.values());
 
     if (uniqueQuestions.length === 0) {
-      return { success: false, error: "The selected sheets do not contain any unique questions." };
+      return {
+        success: false,
+        error: "The selected sheets do not contain any unique questions.",
+      };
     }
 
     // 3. Create the new custom sheet
@@ -251,27 +266,64 @@ export async function mergeSheets(name: string, selectedSheetSlugs: string[]) {
         userId,
         name,
         slug,
-        isPinned: false
-      }
+        isPinned: false,
+      },
     });
 
     // 4. Create the questions for this new sheet
-    const questionData = uniqueQuestions.map(q => ({
+    const questionData = uniqueQuestions.map((q) => ({
       title: q.title,
       url: q.url,
       difficulty: q.difficulty,
       topics: q.topics,
-      sheetSlug: slug
+      sheetSlug: slug,
     }));
 
     await prisma.question.createMany({
-      data: questionData
+      data: questionData,
     });
 
-    revalidatePath('/');
+    revalidatePath("/");
     return { success: true, slug };
   } catch (error: any) {
     console.error("Error merging sheets:", error);
     return { success: false, error: error.message || "Failed to merge sheets" };
+  }
+}
+
+export async function addQuestionToSheet(
+  sheetSlug: string,
+  title: string,
+  url: string,
+  difficulty: string,
+  topics: string[],
+) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  // Verify ownership of the sheet
+  const userSheet = await prisma.userSheet.findFirst({
+    where: { slug: sheetSlug, userId },
+  });
+
+  if (!userSheet) throw new Error("Unauthorized or sheet not found");
+
+  try {
+    const question = await prisma.question.create({
+      data: {
+        title,
+        url,
+        difficulty,
+        topics,
+        sheetSlug,
+      },
+    });
+
+    revalidatePath(`/sheet/${sheetSlug}`);
+    revalidatePath("/");
+    return { success: true, question };
+  } catch (error: any) {
+    console.error("Error adding question:", error);
+    return { success: false, error: error.message };
   }
 }
