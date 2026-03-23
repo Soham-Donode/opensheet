@@ -66,6 +66,13 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
       currentUrl.searchParams.delete("create");
       window.history.replaceState(null, "", currentUrl.toString());
     }
+    if (searchParams.get("merge") === "true") {
+      setMergeOpen(true);
+      // Clean up the URL
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.delete("merge");
+      window.history.replaceState(null, "", currentUrl.toString());
+    }
   }, [searchParams]);
 
   const [renameOpen, setRenameOpen] = useState(false);
@@ -77,7 +84,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
   const handleDeleteSheet = async (id: string, href: string) => {
     if (pathname === href) {
       const currentIndex = customLists.findIndex(l => l.href === href);
-      let nextPath = "/"; // Default to dashboard
+      let nextPath = "/dashboard"; // Default to dashboard
 
       if (customLists.length > 1) {
         // If there's another custom sheet, go to it
@@ -98,7 +105,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
   const popularLists = [
     {
       label: "Dashboard",
-      href: "/",
+      href: "/dashboard",
       icon: (
         <LayoutDashboard className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
       ),

@@ -3,9 +3,6 @@ import { SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
-  BookOpen,
-  BrainCog,
-  FolderHeart,
   ArrowRight,
   Package,
   Pencil,
@@ -14,6 +11,7 @@ import {
   Mailbox,
   Star,
   Sparkles,
+  LayoutDashboard
 } from "lucide-react";
 
 const Squiggle = ({ className }: { className?: string }) => (
@@ -85,32 +83,6 @@ const DocumentIcon = ({ className }: { className?: string }) => (
 export default async function Home() {
   const { userId } = await auth();
 
-  const sheets = [
-    {
-      title: "Striver A2Z",
-      description:
-        "Master the most frequently asked problems logically step-by-step.",
-      href: "/sheet/striver-a2z",
-      icon: <BookOpen className="w-8 h-8 text-[#88AB8E] dark:text-[#88AB8E]" />,
-    },
-    {
-      title: "NeetCode 150",
-      description:
-        "A curated list of leetcode problems to ace your technical interviews.",
-      href: "/sheet/neetcode-150",
-      icon: <BrainCog className="w-8 h-8 text-[#88AB8E] dark:text-[#88AB8E]" />,
-    },
-    {
-      title: "Blind 75",
-      description:
-        "The classic collection of 75 essential algorithmic problems.",
-      href: "/sheet/blind-75",
-      icon: (
-        <FolderHeart className="w-8 h-8 text-[#88AB8E] dark:text-[#88AB8E]" />
-      ),
-    },
-  ];
-
   return (
     <div className="w-full flex flex-col items-center">
       {/* Hero Section */}
@@ -167,19 +139,10 @@ export default async function Home() {
               <>
                 <Button
                   asChild
-                  variant="outline"
-                  className="rounded-full px-8 py-7 text-lg font-bold border-neutral-300 dark:border-white/10 hover:bg-[#88AB8E]/5 hover:text-[#4A644F] transition-all shadow-sm"
+                  className="rounded-full px-10 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none"
                 >
-                  <Link href="#popular-sheets">
-                    Explore Popular Sheets
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  className="rounded-full px-8 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none"
-                >
-                  <Link href="/sheet/striver-a2z?create=true">
-                    Custom Sheets <Sparkles className="ml-2 w-5 h-5 fill-white/20 text-white" />
+                  <Link href="/dashboard">
+                    Go to Dashboard <LayoutDashboard className="ml-2 w-5 h-5 text-white/80" />
                   </Link>
                 </Button>
               </>
@@ -194,37 +157,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Sheets Grid Section */}
-      <section id="popular-sheets" className="w-full max-w-5xl mx-auto px-6 pb-24 z-10 relative scroll-mt-20">
-        <div className="text-center mb-12">
-          <p className="text-sm font-medium tracking-widest uppercase text-neutral-400 mb-3">
-            Get Started
-          </p>
-          <h3 className="text-3xl font-serif text-neutral-900 dark:text-white">
-            Popular Curated Sheets
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sheets.map((sheet) => (
-            <Link
-              key={sheet.href}
-              href={sheet.href}
-              className="group p-8 rounded-[1.5rem] border border-neutral-200/60 dark:border-white/10 hover:border-[#88AB8E]/50 bg-white/70 dark:bg-[#0B0B0B]/80 backdrop-blur-sm transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-none hover:-translate-y-1 content-start"
-            >
-              <div className="bg-neutral-100 dark:bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                {sheet.icon}
-              </div>
-              <h3 className="text-2xl font-serif font-medium mb-3 text-neutral-900 dark:text-white">
-                {sheet.title}
-              </h3>
-              <p className="text-[15px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                {sheet.description}
-              </p>
-            </Link>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
