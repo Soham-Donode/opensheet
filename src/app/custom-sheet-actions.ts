@@ -215,3 +215,63 @@ export async function createEmptySheet(name: string) {
   revalidatePath('/');
   return { success: true, slug };
 }
+
+export async function mergeSheets(name: string, selectedSheetSlugs: string[]) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  const slug = `custom-${userId}-${Date.now()}`;
+
+  try {
+    // 1. Fetch all questions from the selected sheets
+    const questionsToMerge = await prisma.question.findMany({
+      where: {
+        sheetSlug: {
+          in: selectedSheetSlugs
+        }
+      }
+    });
+
+    // 2. Filter unique questions by URL to avoid duplicates
+    const uniqueQuestionsMap = new Map();
+    for (const q of questionsToMerge) {
+      if (!uniqueQuestionsMap.has(q.url)) {
+        uniqueQuestionsMap.set(q.url, q);
+      }
+    }
+    const uniqueQuestions = Array.from(uniqueQuestionsMap.values());
+
+    if (uniqueQuestions.length === 0) {
+      return { success: false, error: "The selected sheets do not contain any unique questions." };
+    }
+
+    // 3. Create the new custom sheet
+    await prisma.userSheet.create({
+      data: {
+        userId,
+        name,
+        slug,
+        isPinned: false
+      }
+    });
+
+    // 4. Create the questions for this new sheet
+    const questionData = uniqueQuestions.map(q => ({
+      title: q.title,
+      url: q.url,
+      difficulty: q.difficulty,
+      topics: q.topics,
+      sheetSlug: slug
+    }));
+
+    await prisma.question.createMany({
+      data: questionData
+    });
+
+    revalidatePath('/');
+    return { success: true, slug };
+  } catch (error: any) {
+    console.error("Error merging sheets:", error);
+    return { success: false, error: error.message || "Failed to merge sheets" };
+  }
+}

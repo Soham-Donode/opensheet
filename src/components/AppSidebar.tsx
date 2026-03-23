@@ -19,6 +19,8 @@ import {
   MoreVertical,
   PanelLeft,
   LogIn,
+  Merge,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -29,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CreateSheetDialog } from "@/components/CreateSheetDialog";
+import { MergeSheetsDialog } from "@/components/MergeSheetsDialog";
 import { StreakTracker } from "@/components/StreakTracker";
 import {
   DropdownMenu,
@@ -49,6 +52,7 @@ import { togglePinUserSheet, deleteUserSheet, renameUserSheet } from "@/app/cust
 export function AppSidebar({ children, customSheets = [] }: { children: React.ReactNode, customSheets?: any[] }) {
   const [open, setOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [mergeOpen, setMergeOpen] = useState(false);
   
   const pathname = usePathname();
   const router = useRouter();
@@ -242,6 +246,26 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                   </AnimatePresence>
                 </div>
                 <div className="flex flex-col gap-1">
+                  <div onClick={(e) => { e.preventDefault(); setCreateOpen(true); setOpen(false); }}>
+                    <SidebarLink
+                      link={{
+                        label: "Sheet studio",
+                        href: "#",
+                        icon: <Sparkles className="text-[#88AB8E] dark:text-[#88AB8E] h-[18px] w-[18px] shrink-0" />
+                      }}
+                      className={open ? "pr-8" : ""}
+                    />
+                  </div>
+                  <div onClick={(e) => { e.preventDefault(); setMergeOpen(true); setOpen(false); }}>
+                    <SidebarLink
+                      link={{
+                        label: "Merge sheets",
+                        href: "#",
+                        icon: <Merge className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
+                      }}
+                      className={open ? "pr-8" : ""}
+                    />
+                  </div>
                   {customLists.map((link) => (
                     <div key={link.id} className="relative group/custom">
                       <div onClick={() => setOpen(false)}>
@@ -316,6 +340,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
     </div>
 
     <CreateSheetDialog open={createOpen} onOpenChange={setCreateOpen} />
+    <MergeSheetsDialog open={mergeOpen} onOpenChange={setMergeOpen} customSheets={customSheets} popularSheets={popularLists} />
 
     <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
       <DialogContent className="sm:max-w-[400px] bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-2xl shadow-2xl p-0 overflow-hidden">
