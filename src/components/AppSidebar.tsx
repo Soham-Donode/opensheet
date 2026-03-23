@@ -154,166 +154,165 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
     >
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody 
-          className="justify-between gap-10"
+          className="justify-between gap-2"
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => {
             if (!isMenuOpen) setOpen(false);
           }}
         >
+          <div className="h-12 relative flex items-center shrink-0">
+            <AnimatePresence mode="wait">
+              {open ? (
+                <motion.div
+                  key="logo-full"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full"
+                >
+                  <Logo />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="logo-icon"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full"
+                >
+                  <LogoIcon />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            <div className="h-12 relative flex items-center">
-              <AnimatePresence mode="wait">
-                {open ? (
-                  <motion.div
-                    key="logo-full"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="w-full"
-                  >
-                    <Logo />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="logo-icon"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.2 }}
-                    className="w-full"
-                  >
-                    <LogoIcon />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* Popular Sheets Section */}
+            <div className="flex flex-col gap-2">
+              <div className="h-6 flex items-center mb-1">
+                <AnimatePresence mode="wait">
+                  {open && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 px-3 whitespace-nowrap"
+                    >
+                      Popular Sheets
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+              <div className="flex flex-col gap-1">
+                {popularLists.map((link, idx) => (
+                  <div key={idx} onClick={() => setOpen(false)}>
+                    <SidebarLink
+                      link={link}
+                      active={pathname === link.href}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-8 flex flex-col gap-4">
-              {/* Popular Lists Section */}
-              <div className="flex flex-col gap-2">
-                <div className="h-6 flex items-center mb-1">
-                  <AnimatePresence mode="wait">
-                    {open && (
-                      <motion.p
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 px-3 whitespace-nowrap"
-                      >
-                        Popular Sheets
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </div>
-                <div className="flex flex-col gap-1">
-                  {popularLists.map((link, idx) => (
-                    <div key={idx} onClick={() => setOpen(false)}>
+
+            {/* Your Sheets Section */}
+            <div className="flex flex-col gap-2 pt-2">
+              <div className="h-6 flex items-center justify-between px-3 mb-1 group/header relative">
+                <AnimatePresence mode="wait">
+                  {open && (
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 whitespace-nowrap"
+                    >
+                      Your Sheets
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+                <AnimatePresence mode="wait">
+                  {open && (
+                    <motion.button
+                      onClick={() => {
+                        setCreateOpen(true);
+                        setOpen(false);
+                      }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                      className="p-1 rounded-md hover:bg-neutral-200/50 dark:hover:bg-white/5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
+              <div className="flex flex-col gap-1">
+                {customLists.map((link) => (
+                  <div key={link.id} className="relative group/custom">
+                    <div onClick={() => setOpen(false)}>
                       <SidebarLink
                         link={link}
                         active={pathname === link.href}
+                        className={open ? "pr-8" : ""}
                       />
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Your Lists Section */}
-              <div className="flex flex-col gap-2 pt-2">
-                <div className="h-6 flex items-center justify-between px-3 mb-1 group/header relative">
-                  <AnimatePresence mode="wait">
                     {open && (
-                      <motion.p
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 whitespace-nowrap"
-                      >
-                        Your Sheets
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                  <AnimatePresence mode="wait">
-                    {open && (
-                      <motion.button
-                        onClick={() => {
-                          setCreateOpen(true);
-                          setOpen(false);
-                        }}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ duration: 0.2 }}
-                        className="p-1 rounded-md hover:bg-neutral-200/50 dark:hover:bg-white/5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                      </motion.button>
-                     )}
-                  </AnimatePresence>
-                </div>
-                <div className="flex flex-col gap-1">
-
-                  {customLists.map((link) => (
-                    <div key={link.id} className="relative group/custom">
-                      <div onClick={() => setOpen(false)}>
-                        <SidebarLink
-                          link={link}
-                          active={pathname === link.href}
-                          className={open ? "pr-8" : ""}
-                        />
-                      </div>
-                      {open && (
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/custom:opacity-100 transition-opacity">
-                          <DropdownMenu onOpenChange={setIsMenuOpen}>
-                            <DropdownMenuTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                className="h-6 w-6 p-0 hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-44 p-1.5 shadow-xl bg-white dark:bg-neutral-900 border-neutral-200/50 dark:border-white/10 overflow-hidden">
-                              <DropdownMenuItem 
-                                className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium transition-colors focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]" 
-                                onClick={() => startTransition(() => togglePinUserSheet(link.id, !link.isPinned))}
-                              >
-                                <Pin className="h-4 w-4 shrink-0" /> {link.isPinned ? "Unpin Sheet" : "Pin Sheet"}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium transition-colors focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]" 
-                                onClick={() => {
-                                  setSheetToRename(link);
-                                  setNewName(link.label);
-                                  setRenameOpen(true);
-                                  setOpen(false);
-                                }}
-                              >
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/custom:opacity-100 transition-opacity">
+                        <DropdownMenu onOpenChange={setIsMenuOpen}>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              className="h-6 w-6 p-0 hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44 p-1.5 shadow-xl bg-white dark:bg-neutral-900 border-neutral-200/50 dark:border-white/10 overflow-hidden">
+                            <DropdownMenuItem 
+                              className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium transition-colors focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]" 
+                              onClick={() => startTransition(() => togglePinUserSheet(link.id, !link.isPinned))}
+                            >
+                              <Pin className="h-4 w-4 shrink-0" /> {link.isPinned ? "Unpin Sheet" : "Pin Sheet"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium transition-colors focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]" 
+                              onClick={() => {
+                                setSheetToRename(link);
+                                setNewName(link.label);
+                                setRenameOpen(true);
+                                setOpen(false);
+                              }}
+                            >
                                 <Pencil className="h-4 w-4 shrink-0" /> Rename
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 focus:bg-red-50 dark:focus:bg-red-950/30 transition-colors"
-                                onClick={() => handleDeleteSheet(link.id, link.href)}
-                              >
-                                <Trash className="h-4 w-4 shrink-0" /> Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {open && customLists.length === 0 && (
-                    <p className="px-3 text-[11px] text-neutral-400/60 dark:text-neutral-500/50 italic py-1">
-                      No custom sheets yet
-                    </p>
-                  )}
-                </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="cursor-pointer gap-2 py-2.5 px-3 rounded-lg font-medium text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 focus:bg-red-50 dark:focus:bg-red-950/30 transition-colors"
+                              onClick={() => handleDeleteSheet(link.id, link.href)}
+                            >
+                              <Trash className="h-4 w-4 shrink-0" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {open && customLists.length === 0 && (
+                  <p className="px-3 text-[11px] text-neutral-400/60 dark:text-neutral-500/50 italic py-1">
+                    No custom sheets yet
+                  </p>
+                )}
               </div>
             </div>
           </div>
+
           <div className="flex flex-col gap-1 pt-4 pb-2 border-t border-neutral-200/50 dark:border-white/10 shrink-0">
             <div onClick={(e) => { e.preventDefault(); setCreateOpen(true); setOpen(false); }}>
               <SidebarLink
