@@ -37,7 +37,6 @@ import {
   togglePinUserSheet,
   deleteUserSheet,
   renameUserSheet,
-  addQuestionToSheet,
 } from "@/app/custom-sheet-actions";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -91,44 +90,9 @@ export default function DashboardClient({
   const [sheetToRename, setSheetToRename] = useState<any>(null);
   const [newName, setNewName] = useState("");
 
-  // Add Question Dialog State
-  const [addQuestionOpen, setAddQuestionOpen] = useState(false);
-  const [sheetForQuestion, setSheetForQuestion] = useState<any>(null);
-  const [qTitle, setQTitle] = useState("");
-  const [qUrl, setQUrl] = useState("");
-  const [qTopic, setQTopic] = useState("");
-  const [newTopic, setNewTopic] = useState("");
-  const [qDifficulty, setQDifficulty] = useState("Medium");
-  const [isAddingNewTopic, setIsAddingNewTopic] = useState(false);
-
   const handleDeleteSheet = (id: string) => {
     startTransition(async () => {
       await deleteUserSheet(id);
-    });
-  };
-
-  const handleAddQuestion = () => {
-    if (!qTitle.trim() || !qUrl.trim() || (!qTopic && !newTopic)) return;
-
-    const topicToUse = isAddingNewTopic ? newTopic.trim() : qTopic;
-    if (!topicToUse) return;
-
-    startTransition(async () => {
-      const result = await addQuestionToSheet(
-        sheetForQuestion.slug,
-        qTitle.trim(),
-        qUrl.trim(),
-        qDifficulty,
-        [topicToUse],
-      );
-      if (result.success) {
-        setAddQuestionOpen(false);
-        setQTitle("");
-        setQUrl("");
-        setQTopic("");
-        setNewTopic("");
-        setIsAddingNewTopic(false);
-      }
     });
   };
 
@@ -323,15 +287,6 @@ export default function DashboardClient({
                       >
                         <Trash className="w-4 h-4" /> Delete
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
-                        onClick={() => {
-                          setSheetForQuestion(sheet);
-                          setAddQuestionOpen(true);
-                        }}
-                      >
-                        <PlusCircle className="w-4 h-4" /> Add Question
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -375,133 +330,6 @@ export default function DashboardClient({
               }}
             >
               {isPending ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Question Dialog */}
-      <Dialog open={addQuestionOpen} onOpenChange={setAddQuestionOpen}>
-        <DialogContent className="sm:max-w-112.5 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-2xl shadow-2xl p-0 overflow-hidden text-neutral-900 dark:text-white">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-xl font-bold">
-              Add Question to {sheetForQuestion?.name}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="px-6 py-4 space-y-4">
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="qTitle"
-                className="text-sm font-semibold text-neutral-500"
-              >
-                Question Title
-              </Label>
-              <Input
-                id="qTitle"
-                value={qTitle}
-                onChange={(e) => setQTitle(e.target.value)}
-                placeholder="e.g. Two Sum"
-                className="h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus:ring-[#88AB8E]/50 focus:border-[#88AB8E] rounded-xl text-[14px]"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="qUrl"
-                className="text-sm font-semibold text-neutral-500"
-              >
-                Question Link
-              </Label>
-              <Input
-                id="qUrl"
-                value={qUrl}
-                onChange={(e) => setQUrl(e.target.value)}
-                placeholder="https://leetcode.com/problems/..."
-                className="h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus:ring-[#88AB8E]/50 focus:border-[#88AB8E] rounded-xl text-[14px]"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-neutral-500">
-                  Difficulty
-                </Label>
-                <Select value={qDifficulty} onValueChange={setQDifficulty}>
-                  <SelectTrigger className="h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 rounded-xl">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-xl">
-                    <SelectItem value="Easy">Easy</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-sm font-semibold text-neutral-500">
-                  Topic
-                </Label>
-                {!isAddingNewTopic ? (
-                  <div className="flex gap-2">
-                    <Select value={qTopic} onValueChange={setQTopic}>
-                      <SelectTrigger className="h-11 flex-1 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 rounded-xl">
-                        <SelectValue placeholder="Topic" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-xl">
-                        {allTopics.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-11 w-11 rounded-xl bg-neutral-50 dark:bg-white/5"
-                      onClick={() => setIsAddingNewTopic(true)}
-                      title="Add new topic"
-                    >
-                      <PlusCircle className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      value={newTopic}
-                      onChange={(e) => setNewTopic(e.target.value)}
-                      placeholder="New Topic..."
-                      className="h-11 flex-1 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 rounded-xl text-[14px]"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-11 w-11 rounded-xl bg-neutral-50 dark:bg-white/5"
-                      onClick={() => setIsAddingNewTopic(false)}
-                      title="Select existing"
-                    >
-                      <ArrowRight className="w-4 h-4 rotate-180" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <DialogFooter className="px-6 py-4 bg-neutral-50 dark:bg-black/20 border-t border-neutral-100 dark:border-white/5 flex gap-2">
-            <Button
-              variant="outline"
-              className="rounded-xl"
-              onClick={() => setAddQuestionOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="bg-[#88AB8E] hover:bg-[#6E8E75] text-white rounded-xl px-6"
-              disabled={isPending || !qTitle || !qUrl || (!qTopic && !newTopic)}
-              onClick={handleAddQuestion}
-            >
-              {isPending ? "Adding..." : "Add Question"}
             </Button>
           </DialogFooter>
         </DialogContent>

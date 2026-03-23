@@ -438,22 +438,18 @@ export const UserSection = () => {
       {!isSignedIn ? (
         <div className="w-full">
           {open ? (
-            <SignInButton mode="modal">
-              <Button
+            <SignInButton mode="modal"><Button
                 variant="ghost"
                 className="w-full justify-start gap-3 h-11 rounded-xl hover:bg-neutral-200/50 dark:hover:bg-white/5 text-neutral-600 dark:text-neutral-400"
               >
                 <LogIn className="h-5 w-5" />
                 <span className="text-sm font-medium">Sign in</span>
-              </Button>
-            </SignInButton>
+              </Button></SignInButton>
           ) : (
             <div className="flex justify-center w-full">
-              <SignInButton mode="modal">
-                <button className="h-11 w-11 flex items-center justify-center rounded-full hover:bg-neutral-200/50 dark:hover:bg-white/5 transition-colors">
+              <SignInButton mode="modal"><button className="h-11 w-11 flex items-center justify-center rounded-full hover:bg-neutral-200/50 dark:hover:bg-white/5 transition-colors">
                   <LogIn className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-                </button>
-              </SignInButton>
+                </button></SignInButton>
             </div>
           )}
         </div>

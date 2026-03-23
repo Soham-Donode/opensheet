@@ -100,14 +100,12 @@ export default async function SheetPage({
               To track your progress and save notes, please sign in.
             </p>
           </div>
-          <SignInButton mode="modal">
-            <Button
+          <SignInButton mode="modal"><Button
               variant="glass"
               className="rounded-full px-8 py-2.5 h-auto text-sm font-semibold tracking-tight shadow-[#88AB8E]/20 dark:shadow-none"
             >
               Sign in to start tracking
-            </Button>
-          </SignInButton>
+            </Button></SignInButton>
         </div>
       )}
 

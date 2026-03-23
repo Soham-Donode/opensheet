@@ -149,7 +149,7 @@ export default async function Home() {
             ) : (
               <SignInButton mode="modal">
                 <Button className="rounded-full px-10 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none">
-                  Get Started <ArrowRight className="ml-2 w-5 h-5" />
+                  <span className="flex items-center gap-2">Get Started <ArrowRight className="w-5 h-5" /></span>
                 </Button>
               </SignInButton>
             )}
