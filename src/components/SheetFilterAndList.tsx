@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import QuestionCard from "@/components/QuestionCard";
+import AddQuestionDialog from "@/components/AddQuestionDialog";
 import {
   Dialog,
   DialogContent,
@@ -70,12 +71,6 @@ export default function SheetFilterAndList({
 
   // Add Question Dialog State
   const [addQuestionOpen, setAddQuestionOpen] = useState(false);
-  const [qTitle, setQTitle] = useState("");
-  const [qUrl, setQUrl] = useState("");
-  const [qTopic, setQTopic] = useState("");
-  const [newTopic, setNewTopic] = useState("");
-  const [qDifficulty, setQDifficulty] = useState("Medium");
-  const [isAddingNewTopic, setIsAddingNewTopic] = useState(false);
 
   const totalSolved = useMemo(() => {
     return questions.filter(
@@ -145,35 +140,7 @@ export default function SheetFilterAndList({
     a.localeCompare(b),
   );
 
-  const handleAddQuestion = async () => {
-    if (!qTitle.trim() || !qUrl.trim() || (!qTopic && !newTopic)) return;
 
-    const topicToUse = isAddingNewTopic ? newTopic.trim() : qTopic;
-    if (!topicToUse) return;
-
-    // We'll need to import the action here or use a prop-based callback
-    // For simplicity, let's assume we can import it (we might need dynamic import or pass from parent)
-    const { addQuestionToSheet } = await import("@/app/custom-sheet-actions");
-
-    startTransition(async () => {
-      const result = await addQuestionToSheet(
-        sheetSlug,
-        qTitle.trim(),
-        qUrl.trim(),
-        qDifficulty,
-        [topicToUse],
-      );
-      if (result.success) {
-        setAddQuestionOpen(false);
-        setQTitle("");
-        setQUrl("");
-        setQTopic("");
-        setNewTopic("");
-        setIsAddingNewTopic(false);
-        // Page will revalidate via server action
-      }
-    });
-  };
 
   const handleRandomProblem = () => {
     const unsolvedLocal = filteredQuestions.filter(
@@ -426,143 +393,12 @@ export default function SheetFilterAndList({
       </div>
 
       {/* Add Question Dialog */}
-      <Dialog open={addQuestionOpen} onOpenChange={setAddQuestionOpen}>
-        <DialogContent className="sm:max-w-[450px] bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-0 overflow-hidden text-neutral-900 dark:text-white font-sans">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-xl font-bold">
-              Add Question to Sheet
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="px-6 py-4 space-y-5">
-            {/* Question Title */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="qTitle"
-                className="text-sm font-medium text-neutral-500 dark:text-neutral-400"
-              >
-                Question Title
-              </Label>
-              <Input
-                id="qTitle"
-                value={qTitle}
-                onChange={(e) => setQTitle(e.target.value)}
-                placeholder="e.g. Two Sum"
-                className="w-full h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus-visible:ring-2 focus-visible:ring-[#88AB8E]/50 focus-visible:border-[#88AB8E] focus-visible:outline-none rounded-xl text-[15px] transition-all"
-              />
-            </div>
-
-            {/* Question Link */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="qUrl"
-                className="text-sm font-medium text-neutral-500 dark:text-neutral-400"
-              >
-                Question Link
-              </Label>
-              <Input
-                id="qUrl"
-                value={qUrl}
-                onChange={(e) => setQUrl(e.target.value)}
-                placeholder="https://leetcode.com/problems/..."
-                className="w-full h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus-visible:ring-2 focus-visible:ring-[#88AB8E]/50 focus-visible:border-[#88AB8E] focus-visible:outline-none rounded-xl text-[15px] transition-all"
-              />
-            </div>
-
-            {/* Difficulty & Topic Row */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Difficulty */}
-              <div className="space-y-2 flex flex-col">
-                <Label className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                  Difficulty
-                </Label>
-                <Select value={qDifficulty} onValueChange={setQDifficulty}>
-                  <SelectTrigger className="w-full h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus:ring-2 focus:ring-[#88AB8E]/50 focus:border-[#88AB8E] rounded-xl text-[15px] transition-all">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-xl">
-                    <SelectItem value="Easy">Easy</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Topic */}
-              <div className="space-y-2 flex flex-col">
-                <Label className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                  Topic
-                </Label>
-                {!isAddingNewTopic ? (
-                  <div className="flex w-full items-center gap-2">
-                    <Select value={qTopic} onValueChange={setQTopic}>
-                      <SelectTrigger className="flex-1 h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus:ring-2 focus:ring-[#88AB8E]/50 focus:border-[#88AB8E] rounded-xl text-[15px] transition-all">
-                        <SelectValue placeholder="Topic" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-xl">
-                        {existingTopics.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-11 w-11 shrink-0 rounded-xl bg-neutral-50 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 border border-neutral-200 dark:border-transparent transition-colors"
-                      onClick={() => setIsAddingNewTopic(true)}
-                      title="Add new topic"
-                    >
-                      <PlusCircle className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex w-full items-center gap-2">
-                    <Input
-                      value={newTopic}
-                      onChange={(e) => setNewTopic(e.target.value)}
-                      placeholder="New Topic..."
-                      className="flex-1 h-11 bg-neutral-50 dark:bg-black/20 border-neutral-200 dark:border-white/10 focus-visible:ring-2 focus-visible:ring-[#88AB8E]/50 focus-visible:border-[#88AB8E] rounded-xl text-[15px] transition-all"
-                      autoFocus
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-11 w-11 shrink-0 rounded-xl bg-neutral-50 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 border border-neutral-200 dark:border-transparent transition-colors"
-                      onClick={() => setIsAddingNewTopic(false)}
-                      title="Select existing"
-                    >
-                      <ChevronLeft className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <DialogFooter className="px-6 py-4 bg-neutral-50 dark:bg-[#151515] border-t border-neutral-200 dark:border-neutral-800">
-            <div className="flex w-full gap-3">
-              <Button
-                className="flex-1 rounded-2xl h-12 text-neutral-900 dark:text-neutral-700 bg-white dark:bg-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-200 border border-neutral-300 dark:border-neutral-300 transition-colors font-semibold"
-                onClick={() => setAddQuestionOpen(false)}
-              >
-                Back Edit
-              </Button>
-              <Button
-                className="flex-1 h-12 rounded-2xl bg-neutral-900 dark:bg-black text-white hover:bg-neutral-800 dark:hover:bg-neutral-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                disabled={
-                  isPending || !qTitle || !qUrl || (!qTopic && !newTopic)
-                }
-                onClick={handleAddQuestion}
-              >
-                {isPending ? "Adding..." : "Save to Workspace"}
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AddQuestionDialog
+        open={addQuestionOpen}
+        onClose={() => setAddQuestionOpen(false)}
+        sheetSlug={sheetSlug}
+        existingTopics={existingTopics}
+      />
     </div>
   );
 }
