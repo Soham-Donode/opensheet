@@ -11,9 +11,10 @@ export const STREAK_UPDATE_EVENT = "opensheet:streak-update";
 
 interface StreakTrackerProps {
   expanded: boolean;
+  size?: "sm" | "lg";
 }
 
-export function StreakTracker({ expanded }: StreakTrackerProps) {
+export function StreakTracker({ expanded, size = "sm" }: StreakTrackerProps) {
   const { isSignedIn } = useUser();
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
@@ -139,7 +140,8 @@ export function StreakTracker({ expanded }: StreakTrackerProps) {
               <div
                 key={i}
                 className={cn(
-                  "w-full pt-[100%] rounded-[2px] transition-colors",
+                  "rounded-[2px] transition-colors",
+                  size === "lg" ? "w-3 h-3 sm:w-4 sm:h-4" : "w-full pt-[100%]",
                   isSolved 
                     ? "bg-[#88AB8E] dark:bg-[#88AB8E] shadow-[0_0_4px_rgba(136,171,142,0.4)]" 
                     : "bg-neutral-200/60 dark:bg-white/5"

@@ -137,8 +137,8 @@ export default function DashboardClient({
       {/* Header & Quick Actions */}
       <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-stretch w-full">
         {/* Welcome & Streaks Card */}
-        <div className="flex-1 w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-[2rem] p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xs">
-          <div className="flex flex-col">
+        <div className="flex-1 w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-[2rem] p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xs relative overflow-hidden">
+          <div className="flex flex-col relative z-10">
             <h1 className="text-3xl font-sans font-bold text-neutral-900 dark:text-white mb-2">
               Welcome back, {user?.firstName || "Learner"}
             </h1>
@@ -146,29 +146,33 @@ export default function DashboardClient({
               Pick up where you left off or start a new challenge.
             </p>
           </div>
-          <div className="w-full sm:w-auto shrink-0 flex items-center justify-center bg-neutral-50 dark:bg-black/20 p-4 rounded-3xl border border-neutral-100 dark:border-white/5">
-            <StreakTracker expanded={true} />
+          <div className="w-full sm:w-auto shrink-0 flex items-center justify-center bg-neutral-50 dark:bg-black/20 p-6 rounded-[2rem] border border-neutral-100 dark:border-white/5 scale-105 sm:scale-110">
+            <StreakTracker expanded={true} size="lg" />
           </div>
         </div>
 
         {/* Quick Actions Card */}
-        <div className="w-full lg:w-80 shrink-0 bg-[#e9efea] dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-[2rem] p-6 sm:p-8 flex flex-col justify-center gap-4 shadow-2xl backdrop-blur-3xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-linear-to-br from-[#88AB8E]/20 via-transparent to-[#AFC8AD]/10 pointer-events-none z-0" />
+        <div className="w-full lg:w-80 shrink-0 bg-[#e9efea] dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-[2rem] p-6 sm:p-8 flex flex-col justify-center gap-4 shadow-sm relative overflow-hidden">
+          <div className="absolute inset-0 bg-linear-to-br from-[#88AB8E]/5 via-transparent to-[#AFC8AD]/5 pointer-events-none z-0" />
           <h2 className="text-lg font-bold font-sans text-neutral-900 dark:text-white relative z-10">
             Quick Actions
           </h2>
           <div className="flex flex-col gap-3 relative z-10 w-full">
             <Button
               onClick={() => router.push("?create=true")}
-              className="w-full bg-[#88AB8E] hover:bg-[#6E8E75] text-white border-none justify-start px-4 h-12 rounded-xl transition-all shadow-[0_4px_12px_rgba(136,171,142,0.2)]"
+              variant="outline"
+              className="w-full bg-white/50 dark:bg-white/5 border-neutral-200 dark:border-white/10 hover:border-[#88AB8E]/50 hover:bg-[#88AB8E]/5 text-neutral-700 dark:text-neutral-300 justify-start px-4 h-12 rounded-xl transition-all group shadow-xs"
             >
-              <Sparkles className="w-4 h-4 mr-3" /> Sheet Studio
+              <Sparkles className="w-4 h-4 mr-3 text-[#88AB8E] group-hover:scale-110 transition-transform" />
+              Sheet Studio
             </Button>
             <Button
               onClick={() => router.push("?merge=true")}
-              className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border-none justify-start px-4 h-12 rounded-xl transition-all shadow-lg"
+              variant="outline"
+              className="w-full bg-white/50 dark:bg-white/5 border-neutral-200 dark:border-white/10 hover:border-neutral-400 dark:hover:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-300 justify-start px-4 h-12 rounded-xl transition-all group shadow-xs"
             >
-              <Merge className="w-4 h-4 mr-3" /> Merge Sheets
+              <Merge className="w-4 h-4 mr-3 text-neutral-400 group-hover:scale-110 transition-transform" />
+              Merge Sheets
             </Button>
           </div>
         </div>
