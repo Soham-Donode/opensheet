@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronDown, ChevronLeft, PlusCircle, X } from "lucide-react";
+import { CustomSelect } from "./ui/CustomSelect";
 
 interface AddQuestionDialogProps {
   open: boolean;
@@ -13,76 +14,7 @@ interface AddQuestionDialogProps {
   existingTopics: string[];
 }
 
-function CustomSelect({
-  value,
-  onValueChange,
-  options,
-  placeholder,
-  className,
-}: {
-  value: string;
-  onValueChange: (val: string) => void;
-  options: string[];
-  placeholder: string;
-  className?: string;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleClick = () => setIsOpen(false);
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, [isOpen]);
-
-  return (
-    <div className="relative w-full">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
-        className={`flex w-full items-center justify-between h-11 px-4 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-neutral-900/50 text-[15px] transition-all hover:bg-neutral-100 dark:hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-[#88AB8E]/50 ${className}`}
-      >
-        <span
-          className={
-            value ? "text-neutral-900 dark:text-white" : "text-neutral-500"
-          }
-        >
-          {value || placeholder}
-        </span>
-        <ChevronDown
-          className={`w-4 h-4 text-neutral-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 w-full mt-2 py-1.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-950 shadow-2xl z-60 animate-in fade-in zoom-in-95 duration-100">
-          <div className="max-h-[240px] overflow-y-auto">
-            {options.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => {
-                  onValueChange(opt);
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                  value === opt
-                    ? "bg-[#88AB8E]/10 text-[#88AB8E] font-medium"
-                    : "hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-300"
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function AddQuestionDialog({
   open,
@@ -216,8 +148,8 @@ export default function AddQuestionDialog({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-[1fr,1fr] gap-4 w-full">
+            <div className="space-y-2 min-w-0">
               <Label className="text-sm font-medium text-neutral-500">
                 Difficulty
               </Label>
@@ -229,7 +161,7 @@ export default function AddQuestionDialog({
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 min-w-0">
               <Label className="text-sm font-medium text-neutral-500">
                 Topic
               </Label>

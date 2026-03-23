@@ -134,6 +134,7 @@ export default async function SheetPage({
             userId={userId}
             sheetName={sheetName}
             sheetSlug={sheet}
+            isStandard={Boolean(SHEET_NAMES[sheet])}
           />
         </div>
       )}
@@ -144,6 +145,8 @@ export default async function SheetPage({
           userId={userId}
           sheetName={sheetName}
           sheetSlug={sheet}
+          allTopics={enhancedQuestions.flatMap((q) => q.topics)}
+          isStandard={Boolean(SHEET_NAMES[sheet])}
         />
       )}
     </div>

@@ -10,16 +10,11 @@ import {
   X,
   ChevronLeft,
 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import QuestionCard from "@/components/QuestionCard";
 import AddQuestionDialog from "@/components/AddQuestionDialog";
+import CloneSheetDialog from "@/components/CloneSheetDialog";
 import {
   Dialog,
   DialogContent,
@@ -51,6 +46,7 @@ interface SheetFilterAndListProps {
   sheetName: string;
   sheetSlug: string; // Add sheetSlug to props
   allTopics?: string[]; // Add allTopics for suggestions
+  isStandard?: boolean;
 }
 
 export default function SheetFilterAndList({
@@ -59,6 +55,7 @@ export default function SheetFilterAndList({
   sheetName,
   sheetSlug,
   allTopics = [],
+  isStandard = false,
 }: SheetFilterAndListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // "all", "solved", "unsolved", "solved_other"
@@ -69,8 +66,9 @@ export default function SheetFilterAndList({
   const [showGlobalSolved, setShowGlobalSolved] = useState(true);
   const [isPending, startTransition] = useTransition();
 
-  // Add Question Dialog State
+  // Dialog States
   const [addQuestionOpen, setAddQuestionOpen] = useState(false);
+  const [cloneSheetOpen, setCloneSheetOpen] = useState(false);
 
   const totalSolved = useMemo(() => {
     return questions.filter(
@@ -237,39 +235,40 @@ export default function SheetFilterAndList({
           <div className="hidden lg:block w-px h-5 bg-neutral-200 dark:bg-white/10 shrink-0"></div>
           <div className="grid grid-cols-2 lg:flex lg:flex-row items-center gap-2 lg:gap-3">
             {/* Status Dropdown */}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full lg:w-37.5 h-9 bg-transparent border-0 shadow-none focus-visible:ring-0 text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-300 px-3">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-[#1a1a1a] dark:border-white/10">
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="solved">Solved</SelectItem>
-                <SelectItem value="unsolved">Unsolved</SelectItem>
-                <SelectItem value="solved_other">In Other Lists</SelectItem>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+              options={[
+                { label: "All Status", value: "all" },
+                { label: "Solved", value: "solved" },
+                { label: "Unsolved", value: "unsolved" },
+                { label: "In Other Lists", value: "solved_other" },
+              ]}
+              size="sm"
+              className="lg:w-40 bg-transparent border-0 dark:bg-transparent"
+              dropdownClassName="lg:w-48"
+            />
 
             <div className="hidden lg:block w-px h-5 bg-neutral-200 dark:bg-white/10 shrink-0"></div>
 
             {/* Difficulty Dropdown */}
-            <Select
+            <CustomSelect
               value={difficultyFilter}
               onValueChange={setDifficultyFilter}
-            >
-              <SelectTrigger className="w-full lg:w-37.5 h-9 bg-transparent border-0 shadow-none focus-visible:ring-0 text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-300 px-3">
-                <SelectValue placeholder="Difficulty" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-[#1a1a1a] dark:border-white/10">
-                <SelectItem value="all">Any Difficulty</SelectItem>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
+              options={[
+                { label: "Any Difficulty", value: "all" },
+                { label: "Easy", value: "easy" },
+                { label: "Medium", value: "medium" },
+                { label: "Hard", value: "hard" },
+              ]}
+              size="sm"
+              className="lg:w-40 bg-transparent border-0 dark:bg-transparent"
+              dropdownClassName="lg:w-48"
+            />
           </div>
           <div className="hidden lg:block flex-1"></div>{" "}
           {/* Spacer to push buttons right */}
-          {/* Global Solved Toggle & Random Button */}
+          {/* Global Solved Toggle & Action Button */}
           <div className="grid grid-cols-2 lg:flex items-center gap-2 lg:gap-3 lg:pr-1">
             <Button
               variant="outline"
@@ -282,14 +281,25 @@ export default function SheetFilterAndList({
               {showGlobalSolved ? "Sync: ON" : "Sync: OFF"}
             </Button>
 
-            <Button
-              variant="outline"
-              onClick={() => setAddQuestionOpen(true)}
-              className="rounded-xl px-4 h-9 border-[#88AB8E]/30 hover:bg-[#88AB8E]/10 hover:text-[#88AB8E] dark:hover:text-[#AFC8AD] text-neutral-600 dark:text-neutral-300 text-[10px] sm:text-xs font-bold transition-all flex-1 lg:flex-initial"
-            >
-              <PlusCircle className="w-3.5 h-3.5 mr-2" />
-              Add Question
-            </Button>
+            {!isStandard ? (
+              <Button
+                variant="outline"
+                onClick={() => setAddQuestionOpen(true)}
+                className="rounded-xl px-4 h-9 border-[#88AB8E]/30 hover:bg-[#88AB8E]/10 hover:text-[#88AB8E] dark:hover:text-[#AFC8AD] text-neutral-600 dark:text-neutral-300 text-[10px] sm:text-xs font-bold transition-all flex-1 lg:flex-initial"
+              >
+                <PlusCircle className="w-3.5 h-3.5 mr-2" />
+                Add Question
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => setCloneSheetOpen(true)}
+                className="rounded-xl px-4 h-9 border-[#88AB8E]/30 hover:bg-[#88AB8E]/10 hover:text-[#88AB8E] dark:hover:text-[#AFC8AD] text-neutral-600 dark:text-neutral-300 text-[10px] sm:text-xs font-bold transition-all flex-1 lg:flex-initial"
+              >
+                <Shuffle className="w-3.5 h-3.5 mr-2" />
+                Clone Sheet
+              </Button>
+            )}
           </div>
         </div>
 
@@ -398,6 +408,13 @@ export default function SheetFilterAndList({
         onClose={() => setAddQuestionOpen(false)}
         sheetSlug={sheetSlug}
         existingTopics={existingTopics}
+      />
+
+      <CloneSheetDialog
+        open={cloneSheetOpen}
+        onClose={() => setCloneSheetOpen(false)}
+        sourceSheetSlug={sheetSlug}
+        sourceSheetName={sheetName}
       />
     </div>
   );

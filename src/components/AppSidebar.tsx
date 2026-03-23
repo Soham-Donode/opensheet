@@ -253,26 +253,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                   </AnimatePresence>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <div onClick={(e) => { e.preventDefault(); setCreateOpen(true); setOpen(false); }}>
-                    <SidebarLink
-                      link={{
-                        label: "Sheet studio",
-                        href: "#",
-                        icon: <Sparkles className="text-[#88AB8E] dark:text-[#88AB8E] h-[18px] w-[18px] shrink-0" />
-                      }}
-                      className={open ? "pr-8" : ""}
-                    />
-                  </div>
-                  <div onClick={(e) => { e.preventDefault(); setMergeOpen(true); setOpen(false); }}>
-                    <SidebarLink
-                      link={{
-                        label: "Merge sheets",
-                        href: "#",
-                        icon: <Merge className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
-                      }}
-                      className={open ? "pr-8" : ""}
-                    />
-                  </div>
+
                   {customLists.map((link) => (
                     <div key={link.id} className="relative group/custom">
                       <div onClick={() => setOpen(false)}>
@@ -333,8 +314,30 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2 pt-4 pb-2 border-t border-neutral-200/50 dark:border-white/10 shrink-0">
-            <StreakTracker expanded={open} />
+          <div className="flex flex-col gap-1 pt-4 pb-2 border-t border-neutral-200/50 dark:border-white/10 shrink-0">
+            <div onClick={(e) => { e.preventDefault(); setCreateOpen(true); setOpen(false); }}>
+              <SidebarLink
+                link={{
+                  label: "Sheet studio",
+                  href: "#",
+                  icon: <Sparkles className="text-[#88AB8E] dark:text-[#88AB8E] h-[18px] w-[18px] shrink-0" />
+                }}
+                className={open ? "pr-8" : ""}
+              />
+            </div>
+            <div onClick={(e) => { e.preventDefault(); setMergeOpen(true); setOpen(false); }}>
+              <SidebarLink
+                link={{
+                  label: "Merge sheets",
+                  href: "#",
+                  icon: <Merge className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
+                }}
+                className={open ? "pr-8" : ""}
+              />
+            </div>
+            <div className="mt-2">
+              <StreakTracker expanded={open} />
+            </div>
             <UserSection />
           </div>
         </SidebarBody>

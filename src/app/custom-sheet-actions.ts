@@ -327,3 +327,49 @@ export async function addQuestionToSheet(
     return { success: false, error: error.message };
   }
 }
+export async function cloneSheet(name: string, sourceSheetSlug: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const slug = `custom-${userId}-${Date.now()}`;
+
+  try {
+    // 1. Fetch all questions from the source sheet
+    const sourceQuestions = await prisma.question.findMany({
+      where: { sheetSlug: sourceSheetSlug },
+    });
+
+    if (sourceQuestions.length === 0) {
+      return { success: false, error: "The source sheet has no questions." };
+    }
+
+    // 2. Create the new custom sheet
+    await prisma.userSheet.create({
+      data: {
+        userId,
+        name,
+        slug,
+        isPinned: false,
+      },
+    });
+
+    // 3. Create the questions for this new sheet
+    const questionData = sourceQuestions.map((q) => ({
+      title: q.title,
+      url: q.url,
+      difficulty: q.difficulty,
+      topics: q.topics,
+      sheetSlug: slug,
+    }));
+
+    await prisma.question.createMany({
+      data: questionData,
+    });
+
+    revalidatePath("/");
+    return { success: true, slug };
+  } catch (error: any) {
+    console.error("Error cloning sheet:", error);
+    return { success: false, error: error.message || "Failed to clone sheet" };
+  }
+}

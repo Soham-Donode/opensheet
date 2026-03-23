@@ -130,13 +130,16 @@ export default function QuestionCard({
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className={`font-medium hover:underline transition-colors truncate ${
+            className={`relative font-medium transition-colors truncate ${
               isCompleted
-                ? "text-green-700 dark:text-green-400 line-through opacity-70"
-                : "text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300"
+                ? "text-[#88AB8E]/60 dark:text-[#AFC8AD]/40"
+                : "text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 hover:underline"
             }`}
           >
             {question.title}
+            {isCompleted && (
+              <span className="absolute left-0 top-1/2 w-full h-[2px] bg-[#88AB8E] opacity-60 -translate-y-1/2 rounded-full animate-in slide-in-from-left duration-300" />
+            )}
           </a>
         </label>
 
