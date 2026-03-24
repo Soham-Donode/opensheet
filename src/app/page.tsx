@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
+"use client";
+
 import { SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,10 @@ import {
   Sparkles,
   LayoutDashboard
 } from "lucide-react";
+import FeaturesSection from "@/components/FeaturesSection";
+import { motion } from "framer-motion";
+import { useAuth } from "@clerk/nextjs";
+
 
 const Squiggle = ({ className }: { className?: string }) => (
   <svg
@@ -80,82 +85,195 @@ const DocumentIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default async function Home() {
-  const { userId } = await auth();
+const FloatingIcon = ({ children, className, delay = 0 }: { children: React.ReactNode, className: string, delay?: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ 
+      opacity: 1, 
+      scale: 1,
+      y: [0, -10, 0],
+    }}
+    transition={{
+      duration: 3,
+      repeat: Infinity,
+      ease: [0.42, 0, 0.58, 1],
+      delay,
+      opacity: { duration: 1, delay },
+      scale: { duration: 1, delay }
+    }}
+    className={className}
+  >
+    {children}
+  </motion.div>
+);
+
+export default function Home() {
+  const { userId } = useAuth();
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as any } },
+  };
 
   return (
     <div className="w-full flex flex-col items-center">
       {/* Hero Section */}
       <section className="relative w-full overflow-hidden min-h-[85vh] flex flex-col items-center justify-center -mt-8">
+        {/* Dynamic Background Glow Spots */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              x: [0, 50, 0],
+              y: [0, 30, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: [0.42, 0, 0.58, 1] }}
+            className="absolute top-[5%] left-[5%] w-[50vw] h-[50vw] bg-[#88AB8E]/5 dark:bg-[#88AB8E]/10 blur-[120px] rounded-full" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.3, 1],
+              x: [0, -60, 0],
+              y: [0, 40, 0]
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: [0.42, 0, 0.58, 1], delay: 1 }}
+            className="absolute bottom-[10%] right-[10%] w-[45vw] h-[45vw] bg-[#AFC8AD]/3 dark:bg-[#AFC8AD]/5 blur-[130px] rounded-full" 
+          />
+        </div>
+
         {/* Floating Background Illustrations */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none select-none max-w-300 mx-auto overflow-visible">
+        <div className="absolute inset-0 w-full h-full pointer-events-none select-none max-w-300 mx-auto overflow-visible z-1 opacity-60 dark:opacity-100">
           {/* Top Left Area */}
-          <Star className="absolute top-[18%] left-[18%] text-amber-400 w-8 h-8 rotate-15 stroke-2 fill-amber-400/20" />
-          <Pencil className="absolute top-[22%] left-[28%] text-[#88AB8E] w-7 h-7 -rotate-12 stroke-2" />
+          <FloatingIcon className="absolute top-[18%] left-[18%]" delay={0.2}>
+            <Star className="text-amber-400 w-8 h-8 rotate-15 stroke-2 fill-amber-400/20" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute top-[22%] left-[28%]" delay={0.5}>
+            <Pencil className="text-[#88AB8E] w-7 h-7 -rotate-12 stroke-2" />
+          </FloatingIcon>
 
           {/* Mid Left Area */}
-          <Package className="absolute top-[45%] left-[8%] text-[#88AB8E] w-20 h-20 rotate-6 stroke-[1.5]" />
-          <Squiggle className="absolute top-[58%] left-[22%] text-[#88AB8E] -rotate-6" />
+          <FloatingIcon className="absolute top-[45%] left-[8%]" delay={1}>
+            <Package className="text-[#88AB8E] w-20 h-20 rotate-6 stroke-[1.5]" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute top-[58%] left-[22%]" delay={0.8}>
+            <Squiggle className="text-[#88AB8E] -rotate-6" />
+          </FloatingIcon>
 
           {/* Bottom Left Area */}
-          <div className="absolute bottom-[28%] left-[14%] w-3 h-3 rounded-full bg-[#88AB8E]" />
-          <DocumentIcon className="absolute bottom-[15%] left-[25%] text-[#88AB8E] -rotate-12" />
-          <Star className="absolute bottom-[12%] left-[38%] text-amber-400 w-5 h-5 -rotate-6 stroke-[2.5]" />
+          <FloatingIcon className="absolute bottom-[28%] left-[14%]" delay={1.2}>
+            <div className="w-3 h-3 rounded-full bg-[#88AB8E]" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute bottom-[15%] left-[25%]" delay={0.4}>
+            <DocumentIcon className="text-[#88AB8E] -rotate-12" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute bottom-[12%] left-[38%]" delay={0.7}>
+            <Star className="text-amber-400 w-5 h-5 -rotate-6 stroke-[2.5]" />
+          </FloatingIcon>
 
           {/* Top Right Area */}
-          <div className="absolute top-[20%] right-[28%] w-3 h-3 rounded-full bg-[#88AB8E]" />
-          <Dashes className="absolute top-[18%] right-[10%] text-[#88AB8E] rotate-12 w-10 h-10" />
-          <Mail className="absolute top-[32%] right-[15%] text-[#88AB8E] w-20 h-20 rotate-12 stroke-[1.5]" />
+          <FloatingIcon className="absolute top-[20%] right-[28%]" delay={0.9}>
+            <div className="w-3 h-3 rounded-full bg-[#88AB8E]" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute top-[18%] right-[10%]" delay={1.1}>
+            <Dashes className="text-[#88AB8E] rotate-12 w-10 h-10" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute top-[32%] right-[15%]" delay={0.3}>
+            <Mail className="text-[#88AB8E] w-20 h-20 rotate-12 stroke-[1.5]" />
+          </FloatingIcon>
 
           {/* Mid Right Area */}
-          <div className="absolute top-[55%] right-[22%] w-2.5 h-2.5 rounded-full bg-[#88AB8E]" />
-          <Heart className="absolute top-[50%] right-[8%] text-[#F94144] w-12 h-12 -rotate-12 stroke-2 fill-white dark:fill-[#0B0B0B]" />
+          <FloatingIcon className="absolute top-[55%] right-[22%]" delay={1.4}>
+            <div className="w-2.5 h-2.5 rounded-full bg-[#88AB8E]" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute top-[50%] right-[8%]" delay={0.6}>
+            <Heart className="text-[#F94144] w-12 h-12 -rotate-12 stroke-2 fill-white dark:fill-[#0B0B0B]" />
+          </FloatingIcon>
 
           {/* Bottom Right Area */}
-          <Mailbox className="absolute bottom-[20%] right-[18%] text-[#88AB8E] w-24 h-24 rotate-6 stroke-[1.5]" />
-          <Star className="absolute bottom-[10%] right-[12%] text-amber-400 w-7 h-7 rotate-45 stroke-[2.5]" />
+          <FloatingIcon className="absolute bottom-[20%] right-[18%]" delay={0.5}>
+            <Mailbox className="text-[#88AB8E] w-24 h-24 rotate-6 stroke-[1.5]" />
+          </FloatingIcon>
+          <FloatingIcon className="absolute bottom-[10%] right-[12%]" delay={1.3}>
+            <Star className="text-amber-400 w-7 h-7 rotate-45 stroke-[2.5]" />
+          </FloatingIcon>
         </div>
 
         {/* Full-Background Glassmorphic Layer */}
-        <div className="absolute inset-0 bg-white/5 dark:bg-white/1 backdrop-blur-[1px] z-5 pointer-events-none" />
+        <div className="absolute inset-0 bg-white/5 dark:bg-white/1 backdrop-blur-[2px] z-5 pointer-events-none" />
+
+        {/* Transition Gradient to Features Section */}
+        <div className="absolute bottom-0 left-0 w-full h-64 bg-linear-to-t from-background via-background/50 to-transparent z-10 pointer-events-none" />
 
         {/* Hero Content */}
-        <div className="relative z-10 flex flex-col items-center px-8 md:px-12 py-10 max-w-4xl text-center">
-          <h2 className="text-sm font-extrabold tracking-[0.2em] uppercase mb-10 text-neutral-900 dark:text-neutral-200">
-            OPENSHEET
-          </h2>
+        <motion.div 
+          className="relative z-20 flex flex-col items-center px-8 md:px-12 py-10 max-w-4xl text-center"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div 
+            variants={itemVariants}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#88AB8E]/10 border border-[#88AB8E]/20 mb-8 backdrop-blur-sm"
+          >
+            <Sparkles className="w-4 h-4 text-[#88AB8E]" />
+            <span className="text-[10px] md:text-sm font-extrabold tracking-[0.2em] uppercase text-[#88AB8E]">
+              OPENSHEET IS LIVE
+            </span>
+          </motion.div>
 
-          <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-serif text-neutral-900 dark:text-white mb-8 leading-[1.1] tracking-tight">
-            Track DSA practice lists, minus the hassle.
-          </h1>
+          <motion.h1 
+            variants={itemVariants}
+            className="text-5xl md:text-7xl lg:text-[5rem] font-serif text-foreground dark:text-white mb-8 leading-[1.05] tracking-tight"
+          >
+            Track DSA practice lists, <span className="text-[#88AB8E] italic">minus the hassle.</span>
+          </motion.h1>
 
-          <p className="text-xl md:text-2xl text-neutral-600 dark:text-neutral-400 mb-12 max-w-2xl leading-relaxed">
+          <motion.p 
+            variants={itemVariants}
+            className="text-xl md:text-2xl text-muted-foreground dark:text-neutral-400 mb-12 max-w-2xl leading-relaxed"
+          >
             Merge popular problem sheets, get a deduplicated combined view, and
             regain the momentum of your interview prep.
-          </p>
+          </motion.p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4">
+          <motion.div 
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row items-center gap-4"
+          >
             {userId ? (
-              <>
-                <Button
-                  asChild
-                  className="rounded-full px-10 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none"
-                >
-                  <Link href="/dashboard">
-                    Go to Dashboard <LayoutDashboard className="ml-2 w-5 h-5 text-white/80" />
-                  </Link>
-                </Button>
-              </>
+              <Button
+                asChild
+                className="rounded-full px-10 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_30px_rgba(136,171,142,0.3)] hover:scale-105 active:scale-95 border-none"
+              >
+                <Link href="/dashboard" className="flex items-center gap-2">
+                  Go to Dashboard <LayoutDashboard className="w-5 h-5 text-white/80" />
+                </Link>
+              </Button>
             ) : (
               <SignInButton mode="modal">
-                <Button className="rounded-full px-10 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_20px_rgba(136,171,142,0.3)] border-none">
+                <Button className="rounded-full px-10 py-7 text-lg font-bold bg-[#88AB8E] hover:bg-[#6E8E75] text-white transition-all shadow-[0_8px_30px_rgba(136,171,142,0.3)] hover:scale-105 active:scale-95 border-none">
                   <span className="flex items-center gap-2">Get Started <ArrowRight className="w-5 h-5" /></span>
                 </Button>
               </SignInButton>
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
+
+      {/* Features Section */}
+      <FeaturesSection />
+
 
     </div>
   );
