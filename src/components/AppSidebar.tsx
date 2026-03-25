@@ -160,6 +160,20 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
           onMouseLeave={() => {
             if (!isMenuOpen) setOpen(false);
           }}
+          brand={
+            <Link
+              href="/"
+              className="font-normal flex space-x-2 items-center text-sm py-1 relative z-20"
+            >
+              <Image
+                src="/logo.svg"
+                alt="Opensheet"
+                width={120}
+                height={30}
+                className="dark:invert h-8 w-auto transition-transform duration-300 hover:scale-105"
+              />
+            </Link>
+          }
         >
           <div className="h-12 relative flex items-center shrink-0">
             <AnimatePresence mode="wait">

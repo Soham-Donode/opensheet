@@ -71,11 +71,14 @@ export const Sidebar = ({
   );
 };
 
-export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+export const SidebarBody = (
+  props: React.ComponentProps<typeof motion.div> & { brand?: React.ReactNode },
+) => {
+  const { brand, ...rest } = props;
   return (
     <>
-      <DesktopSidebar {...props} />
-      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
+      <DesktopSidebar {...rest} />
+      <MobileSidebar brand={brand} {...(rest as React.ComponentProps<"div">)} />
     </>
   );
 };
@@ -110,8 +113,9 @@ export const DesktopSidebar = ({
 export const MobileSidebar = ({
   className,
   children,
+  brand,
   ...props
-}: React.ComponentProps<"div">) => {
+}: React.ComponentProps<"div"> & { brand?: React.ReactNode }) => {
   const { open, setOpen } = useSidebar();
   return (
     <>
@@ -121,7 +125,10 @@ export const MobileSidebar = ({
         )}
         {...props}
       >
-        <div className="flex justify-end z-20 w-full">
+        <div className="flex justify-start z-20 w-fit">
+          {brand}
+        </div>
+        <div className="flex justify-end z-20">
           <Menu
             className="text-neutral-800 dark:text-neutral-200 cursor-pointer"
             onClick={() => setOpen(!open)}
