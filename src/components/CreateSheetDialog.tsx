@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, X, Plus, Minus, Sparkles, Trash2 } from "lucide-react";
-import { generateCustomSheet, saveCustomSheet } from "@/app/custom-sheet-actions";
+import { generateCustomSheet, saveCustomSheet, QuestionInput } from "@/app/custom-sheet-actions";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,7 @@ export function CreateSheetDialog({ open, onOpenChange }: CreateSheetDialogProps
   const [maxQuestions, setMaxQuestions] = useState(15);
   
   const [sheetName, setSheetName] = useState("");
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<QuestionInput[]>([]);
   const [error, setError] = useState("");
 
   const handleAddTopic = (topic: string) => {

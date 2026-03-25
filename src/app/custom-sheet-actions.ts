@@ -2,11 +2,19 @@
 
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { UserSheet } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { GoogleGenAI } from "@google/genai";
 
 // Initialize the Google Gen AI SDK
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+
+export interface QuestionInput {
+  title: string;
+  url: string;
+  difficulty: string;
+  topics: string[];
+}
 
 export async function generateCustomSheet(
   topics: string,
@@ -47,7 +55,7 @@ export async function generateCustomSheet(
   }
 }
 
-export async function saveCustomSheet(name: string, questions: any[]) {
+export async function saveCustomSheet(name: string, questions: QuestionInput[]) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -77,9 +85,9 @@ export async function saveCustomSheet(name: string, questions: any[]) {
 
     revalidatePath("/");
     return { success: true, slug };
-  } catch (error: any) {
-    console.error("Error saving sheet:", error);
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    console.error("Error:", error);
+    return { success: false, error: error instanceof Error ? error.message : "An unknown error occurred" };
   }
 }
 
@@ -144,7 +152,7 @@ export async function getUserSheetsWithPresence(questionUrl: string) {
   });
 
   const sheetsWithPresence = await Promise.all(
-    sheets.map(async (sheet) => {
+    sheets.map(async (sheet: UserSheet) => {
       const existingQuestion = await prisma.question.findFirst({
         where: {
           sheetSlug: sheet.slug,
@@ -285,9 +293,9 @@ export async function mergeSheets(name: string, selectedSheetSlugs: string[]) {
 
     revalidatePath("/");
     return { success: true, slug };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error merging sheets:", error);
-    return { success: false, error: error.message || "Failed to merge sheets" };
+    return { success: false, error: error instanceof Error ? error.message : "Failed to merge sheets" };
   }
 }
 
@@ -322,9 +330,9 @@ export async function addQuestionToSheet(
     revalidatePath(`/sheet/${sheetSlug}`);
     revalidatePath("/");
     return { success: true, question };
-  } catch (error: any) {
-    console.error("Error adding question:", error);
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    console.error("Error:", error);
+    return { success: false, error: error instanceof Error ? error.message : "Failed to execute action" };
   }
 }
 export async function cloneSheet(name: string, sourceSheetSlug: string) {
@@ -368,8 +376,8 @@ export async function cloneSheet(name: string, sourceSheetSlug: string) {
 
     revalidatePath("/");
     return { success: true, slug };
-  } catch (error: any) {
-    console.error("Error cloning sheet:", error);
-    return { success: false, error: error.message || "Failed to clone sheet" };
+  } catch (error: unknown) {
+    console.error("Error:", error);
+    return { success: false, error: error instanceof Error ? error.message : "Failed to execute action" };
   }
 }

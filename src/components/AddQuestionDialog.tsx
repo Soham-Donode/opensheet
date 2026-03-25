@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronLeft, PlusCircle, X } from "lucide-react";
+import { ChevronLeft, PlusCircle, X } from "lucide-react";
 import { CustomSelect } from "./ui/CustomSelect";
 
 interface AddQuestionDialogProps {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getUserStreakData, StreakData } from "@/app/streak-actions";
 import { Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,7 @@ export function StreakTracker({ expanded, size = "sm" }: StreakTrackerProps) {
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchStreak = () => {
+  const fetchStreak = useCallback(() => {
     if (isSignedIn) {
       getUserStreakData()
         .then((data) => {
@@ -40,12 +40,11 @@ export function StreakTracker({ expanded, size = "sm" }: StreakTrackerProps) {
         last30Days: Array(30).fill(false),
       });
     }
-  };
+  }, [isSignedIn]);
 
   useEffect(() => {
-    setLoading(true);
-    fetchStreak();
-  }, [isSignedIn]);
+    setTimeout(() => fetchStreak(), 0);
+  }, [fetchStreak]);
 
   // Listen for custom events to refresh streak data
   useEffect(() => {
@@ -61,7 +60,7 @@ export function StreakTracker({ expanded, size = "sm" }: StreakTrackerProps) {
       window.removeEventListener(STREAK_UPDATE_EVENT, handleUpdate);
       window.removeEventListener("focus", handleUpdate);
     };
-  }, [isSignedIn]);
+  }, [fetchStreak]);
 
   // If loading or completely unavailable, maybe we show an empty skeleton
   if (loading) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -36,13 +36,7 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
   const [newSheetName, setNewSheetName] = useState("");
   const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
-    if (open && isSignedIn) {
-      loadSheets();
-    }
-  }, [open, isSignedIn]);
-
-  const loadSheets = async () => {
+  const loadSheets = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getUserSheetsWithPresence(question.url);
@@ -52,7 +46,13 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [question.url]);
+
+  useEffect(() => {
+    if (open && isSignedIn) {
+      loadSheets();
+    }
+  }, [open, isSignedIn, loadSheets]);
 
   const handleToggle = async (sheetSlug: string, currentStatus: boolean) => {
     const newStatus = !currentStatus;
@@ -62,7 +62,7 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
     
     try {
       await toggleQuestionInSheet(sheetSlug, question, newStatus);
-    } catch (e) {
+    } catch {
       // Revert on failure
       setSheets(sheets.map(s => s.slug === sheetSlug ? { ...s, containsQuestion: currentStatus } : s));
     }
@@ -131,7 +131,7 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
                 </div>
               ) : sheets.length === 0 ? (
                 <div className="text-center py-8 px-4 text-neutral-500 text-sm italic">
-                  You don't have any custom sheets yet.
+                  You don&apos;t have any custom sheets yet.
                 </div>
               ) : (
                 <div className="flex flex-col gap-1 p-2">

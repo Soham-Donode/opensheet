@@ -1,4 +1,4 @@
-import { Search, Shuffle, CheckCircle2 } from "lucide-react";
+import { Search } from "lucide-react";
 
 export default function Loading() {
   return (

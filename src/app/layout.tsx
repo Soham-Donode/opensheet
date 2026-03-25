@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Manrope, Geist_Mono } from "next/font/google";
-import { ClerkProvider, SignInButton, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Button } from "@/components/ui/button";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { UserSheet } from "@prisma/client";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -32,7 +32,7 @@ export default async function RootLayout({
 }>) {
   const { userId } = await auth();
   
-  let customSheets: any[] = [];
+  let customSheets: UserSheet[] = [];
   if (userId) {
     try {
       customSheets = await prisma.userSheet.findMany({

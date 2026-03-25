@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { LucideIcon, Share2, Layers, LineChart, Sparkles, Merge, CheckCircle2, Circle } from "lucide-react";
+import { Sparkles, Merge } from "lucide-react";
 import { motion } from "framer-motion";
 
 
@@ -138,7 +138,7 @@ const HeatmapGraphic = () => (
       <div className="grid grid-cols-7 gap-1.5">
         {Array.from({ length: 28 }).map((_, i) => {
           const intensities = ['bg-foreground/5', 'bg-[#88AB8E]/20', 'bg-[#88AB8E]/40', 'bg-[#88AB8E]/60', 'bg-[#88AB8E]/80', 'bg-[#88AB8E]'];
-          const intensity = i > 12 && i < 22 ? intensities[Math.floor(Math.random() * 3) + 3] : intensities[Math.floor(Math.random() * 2)];
+          const intensity = i > 12 && i < 22 ? intensities[(i % 3) + 3] : intensities[i % 2];
           return (
             <div 
               key={i} 

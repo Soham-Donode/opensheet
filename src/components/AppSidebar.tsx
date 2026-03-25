@@ -28,6 +28,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { UserSheet } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CreateSheetDialog } from "@/components/CreateSheetDialog";
@@ -49,7 +50,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { togglePinUserSheet, deleteUserSheet, renameUserSheet } from "@/app/custom-sheet-actions";
 
-export function AppSidebar({ children, customSheets = [] }: { children: React.ReactNode, customSheets?: any[] }) {
+export function AppSidebar({ children, customSheets = [] }: { children: React.ReactNode, customSheets?: UserSheet[] }) {
   const [open, setOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [mergeOpen, setMergeOpen] = useState(false);
@@ -60,14 +61,14 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
 
   useEffect(() => {
     if (searchParams.get("create") === "true") {
-      setCreateOpen(true);
+      setTimeout(() => setCreateOpen(true), 0);
       // Clean up the URL
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.delete("create");
       window.history.replaceState(null, "", currentUrl.toString());
     }
     if (searchParams.get("merge") === "true") {
-      setMergeOpen(true);
+      setTimeout(() => setMergeOpen(true), 0);
       // Clean up the URL
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.delete("merge");
@@ -76,7 +77,7 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
   }, [searchParams]);
 
   const [renameOpen, setRenameOpen] = useState(false);
-  const [sheetToRename, setSheetToRename] = useState<any>(null);
+  const [sheetToRename, setSheetToRename] = useState<{ id: string, label: string } | null>(null);
   const [newName, setNewName] = useState("");
   const [isPending, startTransition] = React.useTransition();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -371,9 +372,10 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
             className="bg-[#88AB8E] hover:bg-[#6E8E75] text-white" 
             disabled={isPending}
             onClick={() => {
-              if (newName.trim()) {
+              if (newName.trim() && sheetToRename) {
+                const sheetId = sheetToRename.id;
                 startTransition(() => {
-                  renameUserSheet(sheetToRename.id, newName.trim());
+                  renameUserSheet(sheetId, newName.trim());
                 });
               }
               setRenameOpen(false);

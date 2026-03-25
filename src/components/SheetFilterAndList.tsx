@@ -1,28 +1,18 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Search,
   Shuffle,
   CheckCircle2,
   PlusCircle,
-  X,
-  ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import QuestionCard from "@/components/QuestionCard";
 import AddQuestionDialog from "@/components/AddQuestionDialog";
 import CloneSheetDialog from "@/components/CloneSheetDialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 
 interface Progress {
   isCompleted: boolean;
@@ -51,10 +41,8 @@ interface SheetFilterAndListProps {
 
 export default function SheetFilterAndList({
   questions,
-  userId,
   sheetName,
   sheetSlug,
-  allTopics = [],
   isStandard = false,
 }: SheetFilterAndListProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +52,6 @@ export default function SheetFilterAndList({
     new Set(),
   );
   const [showGlobalSolved, setShowGlobalSolved] = useState(true);
-  const [isPending, startTransition] = useTransition();
 
   // Dialog States
   const [addQuestionOpen, setAddQuestionOpen] = useState(false);
@@ -140,48 +127,7 @@ export default function SheetFilterAndList({
 
 
 
-  const handleRandomProblem = () => {
-    const unsolvedLocal = filteredQuestions.filter(
-      (q) => !q.isCompletedLocally && !(showGlobalSolved && q.isSolvedGlobally),
-    );
 
-    if (unsolvedLocal.length === 0) {
-      alert("No unsolved problems found with current filters!");
-      return;
-    }
-
-    const randomIndex = Math.floor(Math.random() * unsolvedLocal.length);
-    const randomQuestion = unsolvedLocal[randomIndex];
-    const topic = randomQuestion.topics?.[0] || "Uncategorized";
-
-    setForceExpandedTopics((prev) => new Set(prev).add(topic));
-
-    // Wait for render
-    setTimeout(() => {
-      const element = document.getElementById(`question-${randomQuestion.id}`);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
-        element.classList.add(
-          "ring-2",
-          "ring-[#88AB8E]",
-          "ring-offset-2",
-          "ring-offset-white",
-          "dark:ring-offset-[#171717]",
-          "transition-all",
-          "duration-500",
-        );
-        setTimeout(() => {
-          element.classList.remove(
-            "ring-2",
-            "ring-[#88AB8E]",
-            "ring-offset-2",
-            "ring-offset-white",
-            "dark:ring-offset-[#171717]",
-          );
-        }, 1500);
-      }
-    }, 100);
-  };
 
   const handleToggleGlobal = () => {
     setShowGlobalSolved(!showGlobalSolved);

@@ -13,8 +13,6 @@ import {
   Pencil,
   Trash,
   FileText,
-  ArrowRight,
-  PlusCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -40,15 +38,6 @@ import {
   renameUserSheet,
 } from "@/app/custom-sheet-actions";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const popularSheets = [
   {
@@ -75,14 +64,19 @@ const popularSheets = [
   },
 ];
 
+interface CustomSheet {
+  id: string;
+  name: string;
+  slug: string;
+  isPinned: boolean;
+}
+
 export default function DashboardClient({
   customSheets,
-  allTopics = [],
   stats = { total: 0, easy: 0, medium: 0, hard: 0 },
   topTopics = [],
 }: {
-  customSheets: any[];
-  allTopics?: string[];
+  customSheets: CustomSheet[];
   stats?: { total: number; easy: number; medium: number; hard: number };
   topTopics?: { name: string; count: number }[];
 }) {
@@ -92,7 +86,7 @@ export default function DashboardClient({
 
   // Rename Dialog State
   const [renameOpen, setRenameOpen] = useState(false);
-  const [sheetToRename, setSheetToRename] = useState<any>(null);
+  const [sheetToRename, setSheetToRename] = useState<CustomSheet | null>(null);
   const [newName, setNewName] = useState("");
 
   const handleDeleteSheet = (id: string) => {

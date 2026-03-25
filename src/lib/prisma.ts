@@ -11,7 +11,7 @@ import { PrismaPg } from '@prisma/adapter-pg'
 const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
   const pool = new Pool({ connectionString })
-  const adapter = new PrismaPg(pool as any)
+  const adapter = new PrismaPg(pool as any) // eslint-disable-line @typescript-eslint/no-explicit-any
   return new PrismaClient({ adapter })
 }
 

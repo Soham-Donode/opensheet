@@ -10,11 +10,24 @@ import { mergeSheets } from "@/app/custom-sheet-actions";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+interface CustomSheet {
+  name: string;
+  slug: string;
+  id?: string;
+  isPinned?: boolean;
+}
+
+interface PopularSheet {
+  label: string;
+  href: string;
+  icon?: React.ReactNode;
+}
+
 interface MergeSheetsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  customSheets: any[];
-  popularSheets: any[];
+  customSheets: CustomSheet[];
+  popularSheets: PopularSheet[];
 }
 
 export function MergeSheetsDialog({ open, onOpenChange, customSheets, popularSheets }: MergeSheetsDialogProps) {

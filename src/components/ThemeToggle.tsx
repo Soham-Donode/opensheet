@@ -9,11 +9,16 @@ export function ThemeToggle({ expanded = true }: { expanded?: boolean }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    // Check if dark mode is already enabled
-    const isDarkMode = document.documentElement.classList.contains("dark");
-    setIsDark(isDarkMode);
+    setTimeout(() => setMounted(true), 0);
   }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      // Check if dark mode is already enabled
+      const isDarkMode = document.documentElement.classList.contains("dark");
+      setTimeout(() => setIsDark(isDarkMode), 0);
+    }
+  }, [mounted]);
 
   const toggleTheme = () => {
     if (!mounted) return;

@@ -15,8 +15,10 @@ async function test() {
       contents: [{ role: 'user', parts: [{ text: 'Say hello' }] }],
     })
     console.log('Response:', JSON.stringify(response, null, 2))
-  } catch (err: any) {
-    console.error('Error:', err.message)
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error('Error:', err.message)
+    }
   }
 }
 

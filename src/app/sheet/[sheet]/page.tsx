@@ -57,7 +57,7 @@ export default async function SheetPage({
 
   let questions: QuestionWithProgress[] = [];
   let dbError = false;
-  let globalSolvedUrls = new Set<string>();
+  const globalSolvedUrls = new Set<string>();
 
   try {
     questions = await fetchQuestionsWithProgress(userId, sheet);
@@ -82,11 +82,8 @@ export default async function SheetPage({
     isCompletedLocally: q.progress[0]?.isCompleted === true,
   }));
 
-  const solvedCount = enhancedQuestions.filter(
-    (q) => q.isCompletedLocally || q.isSolvedGlobally,
-  ).length;
-  const totalCount = enhancedQuestions.length;
-  const progressPercent = totalCount > 0 ? (solvedCount / totalCount) * 100 : 0;
+
+
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full">

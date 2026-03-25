@@ -58,7 +58,7 @@ export async function getUserStreakData(): Promise<StreakData> {
   // Generate the 30-day mapped array and calculate streak
   const last30Days = [];
   let currentStreak = 0;
-  let isStreakActive = true; // Flips to false once we hit a day without solving (after accounting for today)
+
 
   for (let i = 29; i >= 0; i--) {
     const d = new Date(today);
@@ -78,7 +78,6 @@ export async function getUserStreakData(): Promise<StreakData> {
   // streak array goes from oldest (index 0) to today (index 29)
   for (let i = 29; i >= 0; i--) {
     const isToday = i === 29;
-    const isYesterday = i === 28;
     
     if (last30Days[i]) {
       currentStreak++;
