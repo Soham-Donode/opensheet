@@ -234,10 +234,10 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
             </div>
 
             {/* Your Sheets Section */}
-            <div className="flex flex-col gap-2 pt-2">
-              <div className="h-6 flex items-center justify-between px-3 mb-1 group/header relative">
-                <AnimatePresence mode="wait">
-                  {open && (
+            {open && (
+              <div className="flex flex-col gap-2 pt-2">
+                <div className="h-6 flex items-center justify-between px-3 mb-1 group/header relative">
+                  <AnimatePresence mode="wait">
                     <motion.p
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -247,10 +247,8 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                     >
                       Your Sheets
                     </motion.p>
-                  )}
-                </AnimatePresence>
-                <AnimatePresence mode="wait">
-                  {open && (
+                  </AnimatePresence>
+                  <AnimatePresence mode="wait">
                     <motion.button
                       onClick={() => {
                         setCreateOpen(true);
@@ -264,20 +262,18 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </motion.button>
-                  )}
-                </AnimatePresence>
-              </div>
-              <div className="flex flex-col gap-1">
-                {customLists.map((link) => (
-                  <div key={link.id} className="relative group/custom">
-                    <div onClick={() => setOpen(false)}>
-                      <SidebarLink
-                        link={link}
-                        active={pathname === link.href}
-                        className={open ? "pr-8" : ""}
-                      />
-                    </div>
-                    {open && (
+                  </AnimatePresence>
+                </div>
+                <div className="flex flex-col gap-1">
+                  {customLists.map((link) => (
+                    <div key={link.id} className="relative group/custom">
+                      <div onClick={() => setOpen(false)}>
+                        <SidebarLink
+                          link={link}
+                          active={pathname === link.href}
+                          className="pr-8"
+                        />
+                      </div>
                       <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/custom:opacity-100 transition-opacity">
                         <DropdownMenu onOpenChange={setIsMenuOpen}>
                           <DropdownMenuTrigger asChild>
@@ -316,39 +312,43 @@ export function AppSidebar({ children, customSheets = [] }: { children: React.Re
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                    )}
-                  </div>
-                ))}
-                {open && customLists.length === 0 && (
-                  <p className="px-3 text-[11px] text-neutral-400/60 dark:text-neutral-500/50 italic py-1">
-                    No custom sheets yet
-                  </p>
-                )}
+                    </div>
+                  ))}
+                  {customLists.length === 0 && (
+                    <p className="px-3 text-[11px] text-neutral-400/60 dark:text-neutral-500/50 italic py-1">
+                      No custom sheets yet
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1 pt-4 pb-2 border-t border-neutral-200/50 dark:border-white/10 shrink-0">
-            <div onClick={(e) => { e.preventDefault(); setCreateOpen(true); setOpen(false); }}>
-              <SidebarLink
-                link={{
-                  label: "Sheet studio",
-                  href: "#",
-                  icon: <Sparkles className="text-[#88AB8E] dark:text-[#88AB8E] h-[18px] w-[18px] shrink-0" />
-                }}
-                className={open ? "pr-8" : ""}
-              />
-            </div>
-            <div onClick={(e) => { e.preventDefault(); setMergeOpen(true); setOpen(false); }}>
-              <SidebarLink
-                link={{
-                  label: "Merge sheets",
-                  href: "#",
-                  icon: <Merge className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
-                }}
-                className={open ? "pr-8" : ""}
-              />
-            </div>
+            {open && (
+              <>
+                <div onClick={(e) => { e.preventDefault(); setCreateOpen(true); setOpen(false); }}>
+                  <SidebarLink
+                    link={{
+                      label: "Sheet studio",
+                      href: "#",
+                      icon: <Sparkles className="text-[#88AB8E] dark:text-[#88AB8E] h-[18px] w-[18px] shrink-0" />
+                    }}
+                    className="bg-transparent border border-[#88AB8E]/30 dark:border-[#88AB8E]/30 hover:bg-[#88AB8E]/10 dark:hover:bg-[#88AB8E]/10 transition-colors pr-8"
+                  />
+                </div>
+                <div onClick={(e) => { e.preventDefault(); setMergeOpen(true); setOpen(false); }}>
+                  <SidebarLink
+                    link={{
+                      label: "Merge sheets",
+                      href: "#",
+                      icon: <Merge className="text-[#666666] dark:text-neutral-400 h-[18px] w-[18px] shrink-0" />
+                    }}
+                    className="bg-transparent border border-neutral-300 dark:border-white/20 hover:bg-neutral-200/50 dark:hover:bg-white/5 transition-colors pr-8"
+                  />
+                </div>
+              </>
+            )}
             <div className="mt-2">
               <StreakTracker expanded={open} />
             </div>
