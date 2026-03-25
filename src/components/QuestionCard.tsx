@@ -4,10 +4,16 @@ import { updateProgress } from "@/app/actions";
 import { useState, useTransition, useCallback, useRef, useEffect } from "react";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileText, X } from "lucide-react";
+import { FileText, X, MoreVertical, BookmarkPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SaveQuestionDialog } from "./SaveQuestionDialog";
 import { STREAK_UPDATE_EVENT } from "./StreakTracker";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface QuestionCardProps {
   question: {
@@ -29,6 +35,12 @@ const DIFFICULTY_STYLES: Record<string, string> = {
   hard: "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300",
 };
 
+const DIFFICULTY_DOT_STYLES: Record<string, string> = {
+  easy: "bg-green-500",
+  medium: "bg-yellow-500",
+  hard: "bg-red-500",
+};
+
 export default function QuestionCard({
   question,
   isCompleted: initialCompleted,
@@ -38,6 +50,7 @@ export default function QuestionCard({
   const [isCompleted, setIsCompleted] = useState(initialCompleted);
   const [notes, setNotes] = useState(initialNotes);
   const [showNotesModal, setShowNotesModal] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestNotesRef = useRef(notes);
@@ -130,7 +143,7 @@ export default function QuestionCard({
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className={`relative font-medium transition-colors truncate ${
+            className={`relative font-medium transition-colors break-words ${
               isCompleted
                 ? "text-[#88AB8E]/60 dark:text-[#AFC8AD]/40"
                 : "text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 hover:underline"
@@ -143,24 +156,71 @@ export default function QuestionCard({
           </a>
         </label>
 
-        {/* Difficulty Badge */}
-        <span
-          className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${difficultyStyle}`}
-        >
-          {question.difficulty}
-        </span>
+        {/* Difficulty - Full badge on desktop, dot on mobile */}
+        <div className="hidden md:block">
+          <span
+            className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${difficultyStyle}`}
+          >
+            {question.difficulty}
+          </span>
+        </div>
+        <div className="md:hidden">
+          <div
+            className={`w-3 h-3 rounded-full shrink-0 ${
+              DIFFICULTY_DOT_STYLES[question.difficulty.toLowerCase()] ||
+              "bg-gray-500"
+            }`}
+            title={question.difficulty}
+          />
+        </div>
 
-        <SaveQuestionDialog question={question} />
+        {/* Actions - Separate buttons on desktop, dropdown on mobile */}
+        <div className="hidden md:flex md:items-center md:gap-2">
+          <SaveQuestionDialog question={question} />
+          <button
+            onClick={handleNotesClick}
+            className="shrink-0 p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            title="Add notes"
+          >
+            <FileText className="w-5 h-5" />
+          </button>
+        </div>
 
-        {/* Notes Icon Button */}
-        <button
-          onClick={handleNotesClick}
-          className="shrink-0 p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-          title="Add notes"
-        >
-          <FileText className="w-5 h-5" />
-        </button>
+        <div className="md:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="shrink-0 p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                <MoreVertical className="w-5 h-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={() => {
+                  if (!isSignedIn) {
+                    clerk.openSignIn();
+                    return;
+                  }
+                  setShowSaveDialog(true);
+                }}
+              >
+                <BookmarkPlus className="w-4 h-4 mr-2" />
+                Add to sheet
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleNotesClick}>
+                <FileText className="w-4 h-4 mr-2" />
+                Add notes
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
+
+      {/* Mobile Save Dialog */}
+      <SaveQuestionDialog
+        question={question}
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
+      />
 
       {/* Notes Modal */}
       {showNotesModal && (

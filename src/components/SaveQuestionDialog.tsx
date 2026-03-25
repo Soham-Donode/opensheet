@@ -1,12 +1,22 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookmarkPlus, Plus, Loader2, X } from "lucide-react";
-import { getUserSheetsWithPresence, toggleQuestionInSheet, createEmptySheet } from "@/app/custom-sheet-actions";
+import {
+  getUserSheetsWithPresence,
+  toggleQuestionInSheet,
+  createEmptySheet,
+} from "@/app/custom-sheet-actions";
 import { useUser, useClerk } from "@clerk/nextjs";
 
 interface SheetWithPresence {
@@ -23,13 +33,21 @@ interface SaveQuestionDialogProps {
     difficulty: string;
     topics: string[];
   };
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
+export function SaveQuestionDialog({
+  question,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange,
+}: SaveQuestionDialogProps) {
   const { isSignedIn } = useUser();
   const clerk = useClerk();
-  
-  const [open, setOpen] = useState(false);
+
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = externalOnOpenChange || setInternalOpen;
   const [loading, setLoading] = useState(false);
   const [sheets, setSheets] = useState<SheetWithPresence[]>([]);
   const [showCreate, setShowCreate] = useState(false);
@@ -56,15 +74,23 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
 
   const handleToggle = async (sheetSlug: string, currentStatus: boolean) => {
     const newStatus = !currentStatus;
-    
+
     // Optimistic UI update
-    setSheets(sheets.map(s => s.slug === sheetSlug ? { ...s, containsQuestion: newStatus } : s));
-    
+    setSheets(
+      sheets.map((s) =>
+        s.slug === sheetSlug ? { ...s, containsQuestion: newStatus } : s,
+      ),
+    );
+
     try {
       await toggleQuestionInSheet(sheetSlug, question, newStatus);
     } catch {
       // Revert on failure
-      setSheets(sheets.map(s => s.slug === sheetSlug ? { ...s, containsQuestion: currentStatus } : s));
+      setSheets(
+        sheets.map((s) =>
+          s.slug === sheetSlug ? { ...s, containsQuestion: currentStatus } : s,
+        ),
+      );
     }
   };
 
@@ -98,15 +124,17 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          onClick={handleTriggerClick}
-          className="shrink-0 p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-          title="Save to sheet"
-        >
-          <BookmarkPlus className="w-5 h-5" />
-        </button>
-      </DialogTrigger>
+      {externalOpen === undefined && (
+        <DialogTrigger asChild>
+          <button
+            onClick={handleTriggerClick}
+            className="shrink-0 p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            title="Save to sheet"
+          >
+            <BookmarkPlus className="w-5 h-5" />
+          </button>
+        </DialogTrigger>
+      )}
       {open && (
         <DialogContent className="sm:max-w-[400px] font-sans bg-white dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-2xl shadow-xl p-0 [&>button]:hidden flex flex-col m-0">
           <div className="w-full relative z-10 flex flex-col max-h-[80vh]">
@@ -116,8 +144,8 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
                   Save question to...
                 </DialogTitle>
               </DialogHeader>
-              <button 
-                onClick={() => setOpen(false)} 
+              <button
+                onClick={() => setOpen(false)}
                 className="p-2 -mr-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-neutral-500"
               >
                 <X className="w-5 h-5" />
@@ -135,11 +163,16 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
                 </div>
               ) : (
                 <div className="flex flex-col gap-1 p-2">
-                  {sheets.map(sheet => (
-                    <label key={sheet.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/5 cursor-pointer transition-colors group">
-                      <Checkbox 
+                  {sheets.map((sheet) => (
+                    <label
+                      key={sheet.id}
+                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/5 cursor-pointer transition-colors group"
+                    >
+                      <Checkbox
                         checked={sheet.containsQuestion}
-                        onCheckedChange={() => handleToggle(sheet.slug, sheet.containsQuestion)}
+                        onCheckedChange={() =>
+                          handleToggle(sheet.slug, sheet.containsQuestion)
+                        }
                         className="w-5 h-5 rounded-[4px] border-2 border-neutral-300 dark:border-white/20 data-[state=checked]:border-[#88AB8E] data-[state=checked]:bg-[#88AB8E] dark:data-[state=checked]:bg-[#88AB8E] dark:data-[state=checked]:text-white transition-all shadow-sm"
                       />
                       <span className="font-semibold text-[15px] text-neutral-800 dark:text-neutral-200 truncate flex-1 group-hover:text-black dark:group-hover:text-white transition-colors">
@@ -153,8 +186,8 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
 
             <div className="p-4 border-t border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-black/20 rounded-b-2xl">
               {!showCreate ? (
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="w-full justify-start text-[#88AB8E] hover:text-[#6E8E75] hover:bg-[#88AB8E]/10 font-bold"
                   onClick={() => setShowCreate(true)}
                 >
@@ -163,27 +196,40 @@ export function SaveQuestionDialog({ question }: SaveQuestionDialogProps) {
                 </Button>
               ) : (
                 <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Input 
-                    placeholder="Enter sheet name..." 
+                  <Input
+                    placeholder="Enter sheet name..."
                     value={newSheetName}
                     onChange={(e) => setNewSheetName(e.target.value)}
                     className="border-neutral-300 dark:border-white/20 focus:ring-[#88AB8E]/50 font-medium h-12 rounded-xl"
                     autoFocus
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newSheetName.trim() && !creating) {
+                      if (
+                        e.key === "Enter" &&
+                        newSheetName.trim() &&
+                        !creating
+                      ) {
                         handleCreateSheet();
                       }
                     }}
                   />
                   <div className="flex gap-2 justify-end">
-                    <Button variant="ghost" size="sm" onClick={() => setShowCreate(false)} className="rounded-lg">Cancel</Button>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowCreate(false)}
+                      className="rounded-lg"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
                       className="bg-[#88AB8E] hover:bg-[#6E8E75] text-white rounded-lg shadow-md"
                       disabled={!newSheetName.trim() || creating}
                       onClick={handleCreateSheet}
                     >
-                      {creating && <Loader2 className="w-3 h-3 mr-2 animate-spin" />}
+                      {creating && (
+                        <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                      )}
                       Create & Save
                     </Button>
                   </div>
