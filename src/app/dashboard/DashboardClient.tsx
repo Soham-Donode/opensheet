@@ -160,7 +160,10 @@ export default function DashboardClient({
             <div className="flex flex-col xl:flex-row items-center gap-8 xl:gap-10 mb-10">
               {/* Circular Progress Ring */}
               <div className="relative w-32 h-32 shrink-0">
-                <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                <svg
+                  className="w-full h-full -rotate-90 transform"
+                  viewBox="0 0 100 100"
+                >
                   {/* Background Ring */}
                   <circle
                     cx="50"
@@ -209,7 +212,9 @@ export default function DashboardClient({
                     stroke="#f43f5e" // Rose-500
                     strokeWidth="8"
                     strokeDasharray={`${(stats.hard / stats.total) * 251.3} 251.3`}
-                    strokeDashoffset={-((stats.easy + stats.medium) / stats.total) * 251.3}
+                    strokeDashoffset={
+                      -((stats.easy + stats.medium) / stats.total) * 251.3
+                    }
                     strokeLinecap="round"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -330,64 +335,67 @@ export default function DashboardClient({
                   >
                     <Link
                       href={`/sheet/${sheet.slug}`}
-                      className="block h-full cursor-pointer absolute inset-0 z-0"
+                      className="absolute inset-0 z-0 pointer-events-none group-hover:pointer-events-auto"
                     />
-                    <div className="relative z-10 flex items-start justify-between">
+                    <div className="relative z-10 flex items-start justify-between pointer-events-none">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#88AB8E]/10 text-[#88AB8E]">
                           <Pin className="w-5 h-5 rotate-45" />
                         </div>
                         <div>
                           <h3
-                            className="font-bold text-neutral-900 dark:text-white truncate max-w-[120px]"
+                            className="font-bold text-neutral-900 dark:text-white"
                             title={sheet.name}
                           >
                             {sheet.name}
                           </h3>
                         </div>
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-400"
+                      <div className="pointer-events-auto">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-400"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-44 p-1.5 shadow-xl bg-white dark:bg-neutral-900 rounded-[14px] border-neutral-200/50 dark:border-white/10"
                           >
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="w-44 p-1.5 shadow-xl bg-white dark:bg-neutral-900 rounded-[14px] border-neutral-200/50 dark:border-white/10"
-                        >
-                          <DropdownMenuItem
-                            className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
-                            onClick={() =>
-                              startTransition(() =>
-                                togglePinUserSheet(sheet.id, !sheet.isPinned),
-                              )
-                            }
-                          >
-                            <Pin className="w-4 h-4" /> Unpin Sheet
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
-                            onClick={() => {
-                              setSheetToRename(sheet);
-                              setNewName(sheet.name);
-                              setRenameOpen(true);
-                            }}
-                          >
-                            <Pencil className="w-4 h-4" /> Rename
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 dark:focus:bg-red-950/30"
-                            onClick={() => handleDeleteSheet(sheet.id)}
-                          >
-                            <Trash className="w-4 h-4" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <DropdownMenuItem
+                              className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
+                              onClick={() =>
+                                startTransition(() =>
+                                  togglePinUserSheet(sheet.id, !sheet.isPinned),
+                                )
+                              }
+                            >
+                              <Pin className="w-4 h-4" /> Unpin Sheet
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
+                              onClick={() => {
+                                setSheetToRename(sheet);
+                                setNewName(sheet.name);
+                                setRenameOpen(true);
+                              }}
+                            >
+                              <Pencil className="w-4 h-4" /> Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 dark:focus:bg-red-950/30"
+                              onClick={() => handleDeleteSheet(sheet.id)}
+                            >
+                              <Trash className="w-4 h-4" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -445,16 +453,16 @@ export default function DashboardClient({
               >
                 <Link
                   href={`/sheet/${sheet.slug}`}
-                  className="block h-full cursor-pointer absolute inset-0 z-0"
+                  className="absolute inset-0 z-0"
                 />
-                <div className="relative z-10 flex items-start justify-between min-h-16">
+                <div className="relative z-10 flex items-start justify-between min-h-16 pointer-events-none">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-neutral-100 dark:bg-white/5 text-neutral-500">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
                       <h3
-                        className="font-bold text-neutral-900 dark:text-white truncate max-w-[120px]"
+                        className="font-bold text-neutral-900 dark:text-white"
                         title={sheet.name}
                       >
                         {sheet.name}
@@ -465,48 +473,51 @@ export default function DashboardClient({
                     </div>
                   </div>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-400"
+                  <div className="pointer-events-auto">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-400"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-44 p-1.5 shadow-xl bg-white dark:bg-neutral-900 rounded-[14px] border-neutral-200/50 dark:border-white/10"
                       >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="w-44 p-1.5 shadow-xl bg-white dark:bg-neutral-900 rounded-[14px] border-neutral-200/50 dark:border-white/10"
-                    >
-                      <DropdownMenuItem
-                        className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
-                        onClick={() =>
-                          startTransition(() =>
-                            togglePinUserSheet(sheet.id, !sheet.isPinned),
-                          )
-                        }
-                      >
-                        <Pin className="w-4 h-4" /> Pin Sheet
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
-                        onClick={() => {
-                          setSheetToRename(sheet);
-                          setNewName(sheet.name);
-                          setRenameOpen(true);
-                        }}
-                      >
-                        <Pencil className="w-4 h-4" /> Rename
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 dark:focus:bg-red-950/30"
-                        onClick={() => handleDeleteSheet(sheet.id)}
-                      >
-                        <Trash className="w-4 h-4" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem
+                          className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
+                          onClick={() =>
+                            startTransition(() =>
+                              togglePinUserSheet(sheet.id, !sheet.isPinned),
+                            )
+                          }
+                        >
+                          <Pin className="w-4 h-4" /> Pin Sheet
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium focus:bg-[#88AB8E]/10 focus:text-[#4A644F] dark:focus:bg-[#88AB8E]/20 dark:focus:text-[#E2EBE4]"
+                          onClick={() => {
+                            setSheetToRename(sheet);
+                            setNewName(sheet.name);
+                            setRenameOpen(true);
+                          }}
+                        >
+                          <Pencil className="w-4 h-4" /> Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer gap-2 py-2 px-3 rounded-xl font-medium text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300 dark:focus:bg-red-950/30"
+                          onClick={() => handleDeleteSheet(sheet.id)}
+                        >
+                          <Trash className="w-4 h-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </div>
             ))}
